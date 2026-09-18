@@ -1,0 +1,32 @@
+# Секреты — никогда в репозиторий
+.env
+*.key
+*.pem
+*.crt
+!policies/*.crt.example
+
+# Сборка. Каталог dist/ целиком: там артефакты, которые собираются
+# из исходников, включая сам бандл репозитория. Класть бандл внутрь
+# репозитория, из которого он собран, — рекурсия и лишние мегабайты
+# в истории при каждом релизе.
+dist/
+ti-console-*.xpi
+updates.json
+VERSION
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+.pytest_cache/
+
+# Прочее
+.DS_Store
+*.log
+/opt/
+node_modules/
+
+# Линуксовый вариант локальной политики генерируется по требованию:
+#   python3 policies/make-local.py --linux
+# В репозитории лежит только windows-вариант — он и проверяется в CI.
+policies/policies-local-linux.json

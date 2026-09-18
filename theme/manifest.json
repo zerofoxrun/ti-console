@@ -1,0 +1,78 @@
+{
+  "manifest_version": 2,
+  "name": "TI Console Dark",
+  "version": "1.0.0",
+  "description": "Тёмное оформление интерфейса TI-браузера. Палитра совпадает с главной вкладкой и боковой панелью.",
+  "_comment_why_separate": [
+    "Тема — ОТДЕЛЬНОЕ дополнение: Firefox не позволяет объединить тему",
+    "и обычное расширение в одном пакете. Поэтому это второй XPI,",
+    "который так же ставится политикой force_installed.",
+    "Формально это по-прежнему НАШЕ дополнение, а не стороннее —",
+    "требование «только свои расширения» не нарушается.",
+    "",
+    "manifest_version 2 намеренно: темы в Firefox остаются на MV2,",
+    "и никакого кода внутри нет — только цвета. Проверять в теме нечего,",
+    "поэтому и риска она не несёт."
+  ],
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "ti-console-theme@soc.internal"
+    }
+  },
+  "theme": {
+    "properties": {
+      "color_scheme": "dark",
+      "content_color_scheme": "dark"
+    },
+    "colors": {
+      "frame": "#0a0e14",
+      "frame_inactive": "#0a0e14",
+      "tab_background_text": "#9aa7b8",
+      "tab_selected": "#141a22",
+      "tab_text": "#e6edf3",
+      "tab_line": "#3b82f6",
+      "tab_loading": "#3b82f6",
+      "tab_background_separator": "#262f3b",
+      "toolbar": "#141a22",
+      "toolbar_text": "#e6edf3",
+      "toolbar_top_separator": "#262f3b",
+      "toolbar_bottom_separator": "#262f3b",
+      "toolbar_vertical_separator": "#262f3b",
+      "toolbar_field": "#0a0e14",
+      "toolbar_field_text": "#e6edf3",
+      "toolbar_field_border": "#262f3b",
+      "toolbar_field_focus": "#0a0e14",
+      "toolbar_field_text_focus": "#e6edf3",
+      "toolbar_field_border_focus": "#3b82f6",
+      "toolbar_field_highlight": "#3b82f6",
+      "toolbar_field_highlight_text": "#ffffff",
+      "popup": "#141a22",
+      "popup_text": "#e6edf3",
+      "popup_border": "#3a4553",
+      "popup_highlight": "#1c2530",
+      "popup_highlight_text": "#e6edf3",
+      "sidebar": "#141a22",
+      "sidebar_text": "#e6edf3",
+      "sidebar_border": "#262f3b",
+      "sidebar_highlight": "#3b82f6",
+      "sidebar_highlight_text": "#ffffff",
+      "ntp_background": "#0d1117",
+      "ntp_text": "#e6edf3",
+      "bookmark_text": "#9aa7b8",
+      "icons": "#9aa7b8",
+      "icons_attention": "#3b82f6",
+      "button_background_hover": "#1c2530",
+      "button_background_active": "#262f3b"
+    }
+  },
+  "icons": {
+    "48": "icons/icon-48.png",
+    "96": "icons/icon-96.png"
+  },
+  "_comment_color_scheme": [
+    "properties.color_scheme = dark сообщает Firefox, что тема тёмная.",
+    "Это влияет и на встроенные страницы (about:*, просмотрщик PDF),",
+    "и на значение prefers-color-scheme, которое видят сайты,",
+    "когда content-override выставлен в 'auto'."
+  ]
+}

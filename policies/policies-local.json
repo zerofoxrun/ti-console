@@ -1,0 +1,240 @@
+{
+  "_readme": [
+    "ЭТОТ ФАЙЛ СГЕНЕРИРОВАН. Руками не править.",
+    "Источник: policies/policies.json, генератор: policies/make-local.py",
+    "Цель: windows. Для другой ОС: python3 policies/make-local.py --linux",
+    "Правки вносятся в основной файл, потом перегенерировать.",
+    "",
+    "Локальный вариант: сервера нет вообще. Работают дерево инструментов,",
+    "умный поиск, разбор страниц, кейс, экспорт и скелет отчёта.",
+    "Не работают: метапоиск через SearXNG (остаётся резервный режим),",
+    "автоматическое обогащение, анализ моделью.",
+    "",
+    "ЧТО ПРОВЕРИТЬ ПЕРЕД РАСКАТКОЙ:",
+    "  1. Файлы лежат ровно по этим путям и ровно с этими именами:",
+    "     file:///C:/TI-Console/ti-console.xpi",
+    "     file:///C:/TI-Console/ti-console-theme.xpi",
+    "     Имя файла на диске и в политике обязано совпадать: при",
+    "     расхождении расширение просто не ставится, а about:policies",
+    "     при этом показывает зелёное — видно только в about:addons.",
+    "  2. Внутренние зоны в WebsiteFilter: сейчас там заглушки",
+    "     *.internal, *.corp, *.local — подставьте свои."
+  ],
+  "policies": {
+    "AppAutoUpdate": true,
+    "DisableAppUpdate": false,
+    "ExtensionUpdate": true,
+    "ManualAppUpdateOnly": false,
+    "ExtensionSettings": {
+      "*": {
+        "installation_mode": "allowed"
+      },
+      "ti-console@soc.internal": {
+        "installation_mode": "force_installed",
+        "install_url": "file:///C:/TI-Console/ti-console.xpi",
+        "updates_disabled": false,
+        "private_browsing": true
+      },
+      "uBlock0@raymondhill.net": {
+        "installation_mode": "force_installed",
+        "install_url": "https://addons.mozilla.org/firefox/downloads/latest/ublock-origin/latest.xpi",
+        "updates_disabled": false,
+        "private_browsing": true
+      },
+      "foxyproxy@eric.h.jung": {
+        "installation_mode": "force_installed",
+        "install_url": "https://addons.mozilla.org/firefox/downloads/latest/foxyproxy-standard/latest.xpi",
+        "updates_disabled": false,
+        "private_browsing": true
+      },
+      "ti-console-theme@soc.internal": {
+        "installation_mode": "force_installed",
+        "install_url": "file:///C:/TI-Console/ti-console-theme.xpi",
+        "updates_disabled": false
+      }
+    },
+    "FirefoxHome": {
+      "Search": false,
+      "TopSites": false,
+      "SponsoredTopSites": false,
+      "Highlights": false,
+      "Stories": false,
+      "Pocket": false,
+      "SponsoredPocket": false,
+      "Snippets": false,
+      "Locked": true
+    },
+    "SearchEngines": {
+      "Add": [
+        {
+          "Name": "VirusTotal",
+          "URLTemplate": "https://www.virustotal.com/gui/search/{searchTerms}",
+          "Alias": "vt"
+        },
+        {
+          "Name": "БДУ ФСТЭК",
+          "URLTemplate": "https://bdu.fstec.ru/search?q={searchTerms}",
+          "Alias": "bdu"
+        }
+      ],
+      "PreventInstalls": true,
+      "Remove": [
+        "Yahoo",
+        "Amazon.com",
+        "eBay"
+      ]
+    },
+    "DisplayBookmarksToolbar": "newtab",
+    "EnableTrackingProtection": {
+      "Value": true,
+      "Locked": true,
+      "Cryptomining": true,
+      "Fingerprinting": true,
+      "EmailTracking": true
+    },
+    "DisableTelemetry": true,
+    "DisableFirefoxStudies": true,
+    "DisablePocket": true,
+    "DisableFirefoxAccounts": true,
+    "DisableFormHistory": true,
+    "OfferToSaveLogins": false,
+    "PasswordManagerEnabled": false,
+    "DisableSetDesktopBackground": true,
+    "NetworkPrediction": false,
+    "DNSOverHTTPS": {
+      "Enabled": false,
+      "Locked": true
+    },
+    "Certificates": {
+      "ImportEnterpriseRoots": false
+    },
+    "Permissions": {
+      "Camera": {
+        "BlockNewRequests": true,
+        "Locked": true
+      },
+      "Microphone": {
+        "BlockNewRequests": true,
+        "Locked": true
+      },
+      "Location": {
+        "BlockNewRequests": true,
+        "Locked": true
+      },
+      "Notifications": {
+        "BlockNewRequests": true,
+        "Locked": true
+      },
+      "Autoplay": {
+        "Default": "block-audio-video"
+      }
+    },
+    "PopupBlocking": {
+      "Default": true
+    },
+    "Preferences": {
+      "browser.startup.page": {
+        "Value": 1,
+        "Status": "default"
+      },
+      "media.peerconnection.enabled": {
+        "Value": false,
+        "Status": "locked"
+      },
+      "browser.urlbar.suggest.searches": {
+        "Value": false,
+        "Status": "locked"
+      },
+      "browser.search.suggest.enabled": {
+        "Value": false,
+        "Status": "locked"
+      },
+      "browser.contentblocking.category": {
+        "Value": "strict",
+        "Status": "locked"
+      },
+      "network.IDN_show_punycode": {
+        "Value": true,
+        "Status": "locked"
+      },
+      "browser.download.always_ask_before_handling_new_types": {
+        "Value": true,
+        "Status": "default"
+      },
+      "toolkit.legacyUserProfileCustomizations.stylesheets": {
+        "Value": true,
+        "Status": "default"
+      },
+      "extensions.pocket.enabled": {
+        "Value": false,
+        "Status": "locked"
+      },
+      "ui.systemUsesDarkTheme": {
+        "Value": 1,
+        "Status": "default"
+      },
+      "browser.theme.dark-private-windows": {
+        "Value": true,
+        "Status": "default"
+      },
+      "browser.in-content.dark-mode": {
+        "Value": true,
+        "Status": "default"
+      }
+    },
+    "DisableProfileImport": true,
+    "DisableProfileRefresh": true,
+    "DisableDeveloperTools": false,
+    "SearchBar": "unified",
+    "UserMessaging": {
+      "WhatsNew": false,
+      "ExtensionRecommendations": false,
+      "FeatureRecommendations": false,
+      "SkipOnboarding": true,
+      "MoreFromMozilla": false
+    },
+    "3rdparty": {
+      "Extensions": {
+        "ti-console@soc.internal": {
+          "defaultTlpMode": "public",
+          "lockTlpMode": false,
+          "theme": "dark",
+          "lockTheme": false,
+          "contentColorScheme": "dark",
+          "caseStorage": "local",
+          "urlFetch": true,
+          "scanDenylist": [
+            ".internal",
+            ".local",
+            ".corp",
+            "localhost"
+          ],
+          "llmProvider": "",
+          "llmModel": "",
+          "llmApiKey": "",
+          "llmBase": ""
+        }
+      }
+    },
+    "Proxy": {
+      "Mode": "system",
+      "Locked": false
+    },
+    "WebsiteFilter": {
+      "Block": [
+        "*://*.internal/*",
+        "*://*.local/*",
+        "*://*.corp/*",
+        "*://10.*/*",
+        "*://192.168.*/*",
+        "*://172.16.*/*",
+        "*://172.17.*/*",
+        "*://172.18.*/*",
+        "*://172.19.*/*",
+        "*://172.2*.*/*",
+        "*://172.30.*/*",
+        "*://172.31.*/*"
+      ]
+    }
+  }
+}

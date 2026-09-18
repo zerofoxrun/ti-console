@@ -1,0 +1,589 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="dark">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>TI Console</title>
+  <!--
+    ГЛАВНАЯ ВКЛАДКА БРАУЗЕРА
+    ------------------------
+    Подключается через manifest.json -> chrome_url_overrides.newtab.
+    Это локальный HTML внутри расширения (moz-extension://), удалённый URL
+    указать нельзя — ограничение Firefox. Скрипты страницы получают доступ
+    к browser.* API наравне с background-скриптом.
+
+    Внешние ресурсы (CDN, шрифты, аналитика) не подключаются принципиально:
+    главная страница TI-браузера не должна делать ни одного сетевого запроса
+    до явного действия аналитика — иначе она сама становится телеметрией.
+  -->
+  <link rel="stylesheet" href="newtab.css">
+</head>
+<body>
+
+<header class="topbar">
+  <div class="brand">
+    <!-- Лиса в шапке. Живёт всегда, в отличие от большой на пустой выдаче:
+         та уходит при первом результате, и после разбора страница
+         становится сплошной таблицей. Кадры и причины — newtab/fox.js. -->
+    <canvas class="brand-fox" id="brand-fox" aria-hidden="true"></canvas>
+    <span class="brand-mark">TI</span>
+    <span class="brand-name">Console</span>
+    <!-- Метки версии реестра здесь нет намеренно (решение заказчика):
+         аналитику она ничего не сообщает, а место в шапке занимает.
+         Версия расширения — в about:addons, версия реестра — в СОСТОЯНИЕ.md
+         и в выгрузке кейса. -->
+  </div>
+
+  <div class="topbar-controls">
+    <!-- TLP-гейт: главный механизм защиты клиентских данных.
+         В режиме "Клиентские данные" из выдачи убираются все инструменты
+         с exposure=public — те, куда отправка индикатора равна его раскрытию.
+         Остаются только limited: коммерческие сервисы, которые видят запрос,
+         но не публикуют его. Полностью закрытого режима в дереве сейчас нет —
+         внутренний контур из реестра исключён. -->
+    <label class="tlp">
+      <span class="tlp-label">Режим данных</span>
+      <select id="tlp-mode">
+        <option value="public">Публичные источники</option>
+        <option value="client">Клиентские данные</option>
+      </select>
+    </label>
+    <!-- Тема интерфейса. По умолчанию тёмная; политика может зафиксировать
+         (3rdparty -> theme + lockTheme). Атрибут data-theme стоит прямо
+         в <html>, чтобы при загрузке не мелькала светлая заливка. -->
+    <label class="tlp">
+      <span class="tlp-label">Тема</span>
+      <select id="theme-mode" title="Оформление интерфейса">
+        <option value="dark">Тёмная</option>
+        <option value="light">Светлая</option>
+        <option value="system">Как в системе</option>
+      </select>
+    </label>
+    <div class="case-badge" id="case-badge" title="Индикаторов в текущем кейсе">
+      Кейс: <strong id="case-count">0</strong>
+    </div>
+    <!-- Название активного кейса. Кейсов несколько, и складывать
+         индикаторы не в тот — дорого; на вкладке «Разбор IOC» списка
+         кейсов не видно, поэтому подпись висит в шапке.
+         Имени заказчика здесь нет: это просто название, которое
+         аналитик сам и написал. -->
+    <span class="case-name" id="case-name-badge" title="Активный кейс">—</span>
+    <button class="btn btn-ghost" id="btn-open-case">Открыть кейс</button>
+  </div>
+</header>
+
+<div class="layout">
+
+  <!-- ================= ЛЕВАЯ КОЛОНКА: ДЕРЕВО ИНСТРУМЕНТОВ ================= -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-head">
+      <input type="search" id="tool-filter" placeholder="Фильтр инструментов…" autocomplete="off">
+      <label class="chk chk-mini" title="Инструменты, которые без платного тарифа бесполезны">
+        <input type="checkbox" id="hide-paid"> Скрыть платные
+      </label>
+      <div class="sidebar-meta">
+        <span id="tool-count">—</span>
+        <button class="btn btn-mini" id="btn-collapse-all" type="button">Свернуть всё</button>
+      </div>
+    </div>
+    <nav class="tree" id="tool-tree" aria-label="Дерево инструментов"></nav>
+    <div class="sidebar-foot">
+      <span class="legend"><i class="dot dot-limited"></i> лимитированный</span>
+      <span class="legend"><i class="dot dot-public"></i> публичный</span>
+      <span class="legend"><span class="tool-tag">рег.</span> нужна бесплатная регистрация</span>
+      <span class="legend"><span class="tool-tag tag-paid">платно</span> нужен платный тариф</span>
+      <!-- Версия сборки. Не украшение: без неё «обновил файлы, ничего
+           не изменилось» неотличимо от «исправление не работает», и
+           выяснять это приходится сверкой выгрузок. Значение берётся
+           из манифеста, руками сюда не пишется. -->
+      <span class="legend build-ver" id="build-ver" title="Версия расширения"></span>
+    </div>
+  </aside>
+
+  <!-- ================= ПРАВАЯ ЧАСТЬ: ПОИСК ================= -->
+  <main class="main">
+
+    <div class="tabs" role="tablist">
+      <button class="tab is-active" data-tab="smart" role="tab">Разбор IOC</button>
+      <button class="tab" data-tab="global" role="tab">Поиск по источникам</button>
+      <button class="tab" data-tab="case" role="tab">Кейс и отчёт</button>
+    </div>
+
+    <!-- ---------- РАЗБОР IOC ---------- -->
+    <section class="panel is-active" id="panel-smart" role="tabpanel">
+      <p class="panel-hint">
+        Вставьте текст, лог, письмо или выгрузку — индикаторы будут извлечены и
+        сопоставлены с инструментами. Дефанг (<code>hxxp</code>, <code>1.1.1[.]1</code>)
+        распознаётся автоматически. Источником может быть текст, файл
+        (в том числе <strong>PDF</strong>), <strong>ссылка</strong>
+        или <strong>картинка</strong>.
+      </p>
+
+      <div class="input-zone" id="drop-zone">
+        <textarea id="smart-input" rows="7" spellcheck="false"
+          placeholder="185.220.101.34&#10;hxxps://cdn-update[.]delivery/panel/gate.php&#10;d41d8cd98f00b204e9800998ecf8427e&#10;CVE-2025-31324&#10;billing@acme-invoices[.]top"></textarea>
+
+        <!-- ============ ИСТОЧНИК: ССЫЛКА ============
+             Страница ЗАБИРАЕТСЯ, а не открывается. Открытая страница
+             выполняется: скрипты, трекеры, фреймы, отпечаток браузера
+             аналитика. Разбор идёт по тексту ответа. Подробности —
+             в шапке lib/fetchpage.js. -->
+        <div class="src-row">
+          <label class="field field-grow">
+            <span class="field-label">Забрать текст по ссылке</span>
+            <input type="url" id="smart-url" autocomplete="off" spellcheck="false"
+                   placeholder="https://blog.vendor.example/report — дефанг hxxps:// и [.] тоже понимается">
+          </label>
+          <button class="btn btn-secondary" id="btn-fetch-url">Забрать и разобрать</button>
+        </div>
+        <!-- Пусто и скрыто по умолчанию. Постоянное предупреждение «запрос
+             уйдёт с вашего адреса» убрано: аналитик это знает и так, а
+             баннер, который висит всегда, перестаёт читаться — и тогда
+             не читается и тот единственный случай, когда сказать есть что.
+             Сюда пишется ровно один текст: забор выключен политикой SOC
+             (см. initManaged в newtab.js). -->
+        <p class="src-warn" id="url-warn" hidden></p>
+
+        <!-- Оговорки по забранной странице. «0 индикаторов» — утверждение
+             о странице; если статью мы не прочитали, утверждать нечего,
+             и разница между «их там нет» и «мы не прочитали» решает,
+             пойдёт аналитик дальше или закроет вопрос. -->
+        <div class="fetch-notes" id="fetch-notes" hidden></div>
+
+        <div class="input-actions">
+          <label class="btn btn-secondary">
+            Загрузить файл
+            <input type="file" id="smart-file" hidden
+                   accept=".pdf,.txt,.csv,.tsv,.json,.log,.md,.eml,.ioc,.xml">
+          </label>
+          <label class="btn btn-secondary" id="lbl-image" hidden>
+            Распознать картинку
+            <input type="file" id="smart-image" hidden
+                   accept="image/png,image/jpeg,image/webp,image/gif">
+          </label>
+          <button class="btn btn-primary" id="btn-parse">Разобрать</button>
+          <button class="btn btn-ghost" id="btn-clear">Очистить</button>
+          <span class="spacer"></span>
+          <span class="parse-stat" id="parse-stat"></span>
+        </div>
+
+        <!-- ============ ВХОДЯЩИЕ НА ТРИАЖ ============
+             Выдача разбора живёт до следующего разбора. Очередь закрывает
+             промежуток между «нашлось» и «решено»: разобранное копится
+             здесь и уходит либо в кейс, либо в отбой — осознанным
+             действием. Причины — в шапке lib/triage.js. -->
+        <details class="textools" id="triage-box" hidden>
+          <summary>Входящие на триаж
+            <span class="badge badge-count" id="triage-count">0</span>
+            <span class="muted" id="triage-sub"></span>
+          </summary>
+          <div class="textools-body">
+            <div class="input-actions" style="margin-bottom:8px">
+              <button class="btn btn-mini btn-primary" id="tr-to-case">Выбранные в кейс</button>
+              <button class="btn btn-mini" id="tr-dismiss">Выбранные в отбой</button>
+              <button class="btn btn-mini btn-ghost" id="tr-all">Отметить все</button>
+              <span class="spacer"></span>
+              <button class="btn btn-mini btn-ghost" id="tr-forget"
+                      title="Показывать отклонённое снова при следующем разборе">Забыть отбой</button>
+            </div>
+            <div id="triage-list"></div>
+            <p class="triage-note" id="triage-note"></p>
+          </div>
+        </details>
+
+        <!-- ============ ИНСТРУМЕНТЫ ТЕКСТА ============
+             Всё, ради чего аналитик уходил в CyberChef: раскодировать
+             base64 из командной строки, снять URL-кодирование, посчитать
+             хеши. Там это означало вставить содержимое расследования
+             в чужой сайт; здесь — чистые вычисления на месте.
+
+             Свёрнуто по умолчанию: нужно не в каждом разборе. -->
+        <details class="textools" id="textools">
+          <summary>Инструменты текста <span class="muted">— base64, URL, hex, хеши, дедупликация</span></summary>
+          <div class="textools-body">
+            <div class="input-actions">
+              <button class="btn btn-mini" id="tt-b64" title="Найти и раскодировать base64, в том числе PowerShell -EncodedCommand">base64 → текст</button>
+              <button class="btn btn-mini" id="tt-url">URL → текст</button>
+              <button class="btn btn-mini" id="tt-hex">hex → текст</button>
+              <button class="btn btn-mini" id="tt-dedupe" title="Схлопнуть повторы и посчитать по типам">дедупликация</button>
+              <button class="btn btn-mini" id="tt-hash" title="MD5, SHA-1, SHA-256, SHA-512 от содержимого поля">хеши строки</button>
+              <button class="btn btn-mini" id="tt-diff" title="Что добавилось в обновлённом отчёте по сравнению со старым">сравнить со списком…</button>
+              <span class="spacer"></span>
+              <button class="btn btn-mini btn-ghost" id="tt-undo" hidden>вернуть как было</button>
+            </div>
+            <!-- Сравнение двух списков. Ничего не хранится: оба списка
+                 вставляет человек, результат живёт до следующего нажатия. -->
+            <div class="tt-diff" id="tt-diff-box" hidden>
+              <label class="field field-grow">
+                <span class="field-label">Список для сравнения (старая версия отчёта)</span>
+                <textarea id="tt-diff-input" rows="4" spellcheck="false"
+                          placeholder="Вставьте прежний список индикаторов — сравнение идёт с тем, что сейчас в поле выше"></textarea>
+              </label>
+              <div class="input-actions">
+                <button class="btn btn-mini btn-primary" id="tt-diff-run">Сравнить</button>
+                <button class="btn btn-mini btn-ghost" id="tt-diff-close">Закрыть</button>
+              </div>
+            </div>
+            <p class="textools-note" id="tt-note" hidden></p>
+            <div class="textools-out" id="tt-out" hidden></div>
+          </div>
+        </details>
+
+        <!-- ============ ИСТОЧНИК: КАРТИНКА ============
+             Картинка кладётся рядом с распознанным текстом намеренно.
+             Проверить распознавание программно нечем — источником были
+             пиксели. Единственная работающая проверка здесь — глаза
+             аналитика, и для неё нужно, чтобы оригинал и результат были
+             видны одновременно. -->
+        <section class="ocr" id="ocr-block" hidden>
+          <div class="ocr-head">
+            <strong class="ocr-title">Распознано с картинки</strong>
+            <span class="parse-stat" id="ocr-stat"></span>
+            <span class="spacer"></span>
+            <button class="btn btn-mini btn-ghost" id="btn-ocr-close" type="button">Убрать картинку</button>
+          </div>
+          <div class="ocr-grid">
+            <figure class="ocr-shot">
+              <img id="ocr-image" alt="Исходная картинка для сверки с распознанным текстом">
+            </figure>
+            <div class="ocr-side">
+              <p class="ocr-note">
+                Текст распознан моделью и помещён в поле выше — его
+                <strong>можно и нужно править</strong>. Сверьте с картинкой:
+                <code>0</code>/<code>O</code>, <code>1</code>/<code>l</code>,
+                <code>5</code>/<code>S</code> в хеше или домене модель путает,
+                и автоматической проверки от этого нет.
+              </p>
+              <div class="ocr-unclear" id="ocr-unclear" hidden></div>
+            </div>
+          </div>
+        </section>
+      </div>
+
+      <div class="results" id="smart-results"></div>
+
+      <div class="bulk-bar" id="bulk-bar" hidden>
+        <label class="chk"><input type="checkbox" id="chk-all"> Выбрать все</label>
+        <span class="spacer"></span>
+        <button class="btn btn-secondary" id="btn-add-case">Добавить в кейс</button>
+        <button class="btn btn-secondary" id="btn-open-selected">Открыть в инструментах…</button>
+        <button class="btn btn-secondary" id="btn-playbook-selected"
+                title="Последовательность проверок под тип задачи">Плейбук…</button>
+        <!-- Дефанг на выходе. Индикаторы уходят в тикеты и чаты, где
+             по ссылке кликают не глядя; руками это делать забывают. -->
+        <button class="btn btn-mini" id="btn-copy-defanged"
+                title="Скопировать выбранные в виде evil[.]com — чтобы по ним не кликнули в тикете">копировать дефангом</button>
+        <button class="btn btn-mini btn-ghost" id="btn-copy-plain"
+                title="Скопировать выбранные как есть — для машинной обработки">копировать как есть</button>
+        <div class="menu" id="open-menu" hidden></div>
+      </div>
+
+      <!-- ================= ВТОРОЙ ЭТАП: АНАЛИЗ МОДЕЛЬЮ =================
+           Отдельный шаг, а не часть разбора. Разбор на индикаторы —
+           детерминированный и мгновенный; анализ моделью занимает десятки
+           секунд и требует поднятого GPU-хоста. Смешивать их в одну кнопку
+           значит заставлять ждать там, где ждать не нужно.
+
+           Блок скрыт целиком, пока в политике не задан адрес бэкенда:
+           показывать неработающую кнопку хуже, чем не показывать ничего. -->
+      <section class="analysis" id="analysis-block" hidden>
+        <div class="analysis-head">
+          <h3 class="analysis-title">Второй этап: анализ моделью</h3>
+          <span class="model-state" id="model-state" title="Состояние локальной модели">проверяю…</span>
+        </div>
+
+        <p class="panel-hint">
+          Разбирает <strong>исходный текст</strong> из поля выше — отчёт, статью,
+          бюллетень. Каждое утверждение модель обязана подтвердить дословной
+          цитатой; цитата проверяется автоматически, неподтверждённое
+          в отчёт не попадает.
+        </p>
+
+        <div class="input-actions">
+          <label class="field">
+            <span class="field-label">Задача</span>
+            <select id="analysis-task">
+              <option value="summary">Выжимка с цитатами</option>
+              <option value="iocs">Роли индикаторов</option>
+              <option value="attack">Техники MITRE ATT&amp;CK</option>
+              <option value="report">Черновик рекомендаций</option>
+            </select>
+          </label>
+          <button class="btn btn-primary" id="btn-analyze">Проанализировать</button>
+          <span class="spacer"></span>
+          <span class="parse-stat" id="analysis-stat"></span>
+        </div>
+
+        <div class="analysis-out" id="analysis-out"></div>
+      </section>
+    </section>
+
+    <!-- ---------- ПОИСК ПО ИСТОЧНИКАМ ---------- -->
+    <section class="panel" id="panel-global" role="tabpanel">
+      <p class="panel-hint">
+        Метапоиск по интернету через собственный инстанс SearXNG. Профиль источников
+        жёстко ограничивает список площадок — это и есть фильтрация, о которой речь.
+        Без бэкенда PoC открывает выбранные площадки напрямую.
+      </p>
+
+      <div class="global-form">
+        <input type="search" id="global-query" placeholder="Ключевые слова, название группировки, семейство ВПО…">
+
+        <!-- ============ ШАБЛОНЫ ЗАПРОСОВ (дорки) ============
+             Замена расширения OSINT Google Dork Scanner. Оно, помимо
+             прочего, требовало доступ ко всем сайтам и заброшено с 2023
+             на MV2 — то есть в современном Firefox не работает вовсе.
+             Сама функция сводится к набору шаблонов и подстановке. -->
+        <div class="field">
+          <span class="field-label">
+            Шаблон запроса
+            <span class="muted">подставляется в поле выше; {{q}} — то, что там уже введено</span>
+          </span>
+          <div class="chips" id="dork-chips"></div>
+        </div>
+
+        <div class="field">
+          <span class="field-label">Профиль источников</span>
+          <div class="chips" id="source-profiles"></div>
+        </div>
+
+        <div class="field-row">
+          <label class="field">
+            <span class="field-label">Период</span>
+            <select id="global-time">
+              <option value="">без ограничения</option>
+              <option value="day">сутки</option>
+              <option value="week">неделя</option>
+              <option value="month">месяц</option>
+              <option value="year">год</option>
+            </select>
+          </label>
+          <label class="field">
+            <span class="field-label">Язык</span>
+            <select id="global-lang">
+              <option value="">любой</option>
+              <option value="ru">русский</option>
+              <option value="en">английский</option>
+            </select>
+          </label>
+          <label class="field field-grow">
+            <span class="field-label">Адрес SearXNG</span>
+            <input type="url" id="searx-url" placeholder="https://searx.internal">
+          </label>
+        </div>
+
+        <div class="field">
+          <span class="field-label">Площадки в профиле <span class="muted" id="domain-count"></span></span>
+          <div class="domain-list" id="domain-list"></div>
+        </div>
+
+        <!-- Предпросмотр итогового запроса. Появился после того, как
+             шаблон со своими площадками склеился с профилем и дал
+             гарантированно пустую выдачу: по «ничего не найдено»
+             отличить противоречивый запрос от честного отсутствия
+             данных невозможно. -->
+        <div class="query-preview" id="query-preview" hidden></div>
+
+        <div class="input-actions">
+          <button class="btn btn-primary" id="btn-global-search">Искать</button>
+          <button class="btn btn-secondary" id="btn-global-direct">Открыть площадки напрямую</button>
+          <span class="spacer"></span>
+          <span class="parse-stat" id="global-stat"></span>
+        </div>
+      </div>
+    </section>
+
+    <!-- ---------- КЕЙС ---------- -->
+    <section class="panel" id="panel-case" role="tabpanel">
+      <p class="panel-hint">
+        Кейс — рабочая единица: набор индикаторов, источников и заметок.
+        Из него собирается скелет отчёта. Конфиденциальные данные из кейса
+        в публичные источники не отправляются.
+      </p>
+
+      <!-- Видно только в режиме caseStorage=local. Кейс живёт в профиле
+           браузера: сброс профиля или переустановка — и он потерян.
+           Предупреждение показывается всегда, а не один раз при первом
+           запуске: цена молчания здесь — потерянное расследование. -->
+      <div class="notice" id="local-storage-notice" hidden>
+        <strong>Кейс хранится только в этом браузере.</strong>
+        На сервер он не отправляется — так решено, потому что сервер арендованный
+        и индикаторов клиентов на нём быть не должно. Следствие: сброс профиля
+        или переустановка браузера уничтожают кейс. Выгружайте результат
+        в файл до закрытия расследования, а в OpenCTI загружайте выгруженный
+        STIX вручную через Data&nbsp;→&nbsp;Import.
+      </div>
+
+      <!-- ============ ВЫБОР КЕЙСА ============
+           Кейсов несколько, у каждого свои индикаторы и своя
+           хронология. Экспорт, отчёт и сводка берут ТОЛЬКО активный
+           кейс — в этом и смысл разделения. -->
+      <div class="field-row case-bar">
+        <label class="field field-grow">
+          <span class="field-label">Активный кейс</span>
+          <select id="case-select"></select>
+        </label>
+        <button class="btn btn-secondary" id="btn-case-new">Новый кейс</button>
+        <label class="btn btn-secondary" id="lbl-case-import" title="Загрузить ранее выгруженный case.json отдельным кейсом">
+          Импорт JSON
+          <input type="file" id="case-import" hidden accept=".json,application/json">
+        </label>
+        <button class="btn btn-ghost btn-danger" id="btn-case-delete" title="Удалить кейс целиком вместе с хронологией">Удалить кейс</button>
+      </div>
+
+      <p class="case-warn" id="case-warn" hidden></p>
+      <p class="case-migrated" id="case-migrated" hidden>
+        Прежний общий кейс перенесён отдельным кейсом. Старые данные
+        в профиле оставлены как резервная копия. Проверьте, что в нём
+        индикаторы одного расследования, и дайте ему название.
+      </p>
+
+      <div class="field-row">
+        <label class="field field-grow">
+          <span class="field-label">Название кейса</span>
+          <input type="text" id="case-title" placeholder="Например: рассылка с вложением .lnk, клиент N">
+        </label>
+        <label class="field">
+          <span class="field-label">TLP</span>
+          <select id="case-tlp">
+            <option>TLP:CLEAR</option>
+            <option>TLP:GREEN</option>
+            <option selected>TLP:AMBER</option>
+            <option>TLP:AMBER+STRICT</option>
+            <option>TLP:RED</option>
+          </select>
+        </label>
+      </div>
+
+      <div class="case-table-wrap">
+        <table class="case-table" id="case-table">
+          <thead>
+            <tr>
+              <th>Тип</th><th>Значение</th>
+              <th title="Что аналитик выяснил про этот индикатор">Вердикт</th>
+              <th title="Какой сервис дал вердикт — чтобы через неделю не проверять заново">Чем проверен</th>
+              <th title="Свободная заметка и теги через запятую">Заметка</th>
+              <th>Флаги</th><th>Источник</th><th></th>
+            </tr>
+          </thead>
+          <tbody id="case-body"></tbody>
+        </table>
+        <p class="empty" id="case-empty">Кейс пуст. Добавьте индикаторы из вкладки «Разбор IOC».</p>
+      </div>
+
+      <!-- Счётчик непроверенных. Кейс на сорок индикаторов, из которых
+           тридцать восемь не проверены, выглядит как работа, но ею
+           не является — и это должно быть видно, не разворачивая таблицу. -->
+      <p class="parse-stat" id="case-stats"></p>
+
+      <!-- Включается только когда анализ реально выполнялся. В отчёт идут
+           ТОЛЬКО подтверждённые цитатой утверждения — неподтверждённые
+           видны в интерфейсе, но в документ не переносятся. -->
+      <label class="chk chk-mini" id="include-analysis-wrap" hidden>
+        <input type="checkbox" id="include-analysis" checked>
+        Включить в отчёт выжимку модели <span class="muted" id="include-analysis-note"></span>
+      </label>
+
+      <!-- ================= ХРОНОЛОГИЯ =================
+           Кейс отвечает «что известно», хронология — «как мы к этому
+           пришли». Свёрнута по умолчанию: при работе она не нужна,
+           нужна при передаче смены и при возврате к кейсу через неделю.
+
+           Живёт в том же профиле, что и кейс, и очищается вместе с ним —
+           иначе удалённый индикатор оставался бы в журнале. -->
+      <!-- ============ СХЕМА КЕЙСА ============
+           НЕ граф связей инфраструктуры: такой требует обогащения, а его
+           здесь нет. Рёбра двух видов и оба подписаны — «из источника»
+           и «часть целого». Подробности и причина — в шапке lib/casegraph.js.
+           Появляется только при достаточном числе индикаторов: на меньшем
+           таблица выше читается быстрее. -->
+      <details class="timeline-box" id="graph-box">
+        <summary>
+          Схема кейса: откуда что взялось
+          <span class="badge badge-count" id="graph-count">0</span>
+        </summary>
+        <div class="graph-body" id="graph-body"></div>
+        <p class="graph-detail" id="graph-detail">Нажмите на линию или узел — здесь появится, что это значит.</p>
+        <p class="timeline-note">
+          Схема показывает <strong>происхождение</strong>, а не связность
+          инфраструктуры: линия означает «извлечено отсюда» или «часть целого»
+          (URL&nbsp;→&nbsp;хост, почта&nbsp;→&nbsp;домен, адрес&nbsp;→&nbsp;подсеть).
+          Того, что два хоста принадлежат одной кампании, здесь нет и быть
+          не может — это требует обогащения, которого браузер не делает.
+        </p>
+      </details>
+
+      <details class="timeline-box" id="timeline-box">
+        <summary>
+          Хронология работы
+          <span class="badge badge-count" id="timeline-count">0</span>
+        </summary>
+        <div class="timeline-body" id="timeline-body"></div>
+        <p class="timeline-note">
+          Записывается то, что меняет состояние расследования: разобранные
+          источники, добавленные индикаторы, вердикты, плейбуки, выгрузки.
+          Текст заметок не записывается — он уже есть в таблице выше.
+        </p>
+      </details>
+
+      <div class="input-actions">
+        <button class="btn btn-secondary" id="btn-export-csv">Экспорт CSV</button>
+        <button class="btn btn-secondary" id="btn-export-json">Экспорт JSON</button>
+        <button class="btn btn-secondary" id="btn-export-stix">Экспорт STIX 2.1</button>
+        <button class="btn btn-primary" id="btn-report">Скелет отчёта (MD)</button>
+        <!-- Сводка смены отделена от отчёта намеренно: отчёт читает
+             получатель, сводку — сменщик, и в ней есть раздел
+             «что осталось», которому в документе клиенту не место. -->
+        <button class="btn btn-secondary" id="btn-handover" title="Что сделано, что установлено, что осталось, что требует решения">Сводка для передачи</button>
+        <button class="btn btn-mini btn-ghost" id="btn-handover-file" title="Сохранить сводку файлом">↓ файлом</button>
+        <span class="spacer"></span>
+        <button class="btn btn-ghost btn-danger" id="btn-case-clear">Очистить кейс</button>
+      </div>
+
+      <pre class="report-out" id="report-out" hidden></pre>
+    </section>
+
+  </main>
+</div>
+
+<!-- Меню плейбуков: позиционируется у нажатой кнопки, поэтому живёт
+     в корне документа, а не внутри карточки индикатора. -->
+<div class="menu menu-float" id="playbook-menu" hidden></div>
+
+<!-- ================= КОМАНДНАЯ ПАЛИТРА =================
+     86 инструментов — больше, чем можно найти глазами. Ctrl+K ищет
+     по инструментам, плейбукам и действиям сразу. -->
+<div class="overlay" id="palette" hidden>
+  <div class="palette-box" role="dialog" aria-label="Командная палитра">
+    <input type="text" id="palette-input" autocomplete="off" spellcheck="false"
+           placeholder="Инструмент, плейбук или действие…  (Esc — закрыть)">
+    <div class="palette-list" id="palette-list"></div>
+    <div class="palette-foot">
+      <kbd>↑</kbd><kbd>↓</kbd> выбор · <kbd>Enter</kbd> запуск · <kbd>Esc</kbd> закрыть
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast" hidden></div>
+
+<script src="../lib/compat.js"></script>
+<script src="../lib/ioc.js"></script>
+<script src="../lib/fetchpage.js"></script>
+<script src="../lib/playbook.js"></script>
+<script src="../lib/query.js"></script>
+<script src="../lib/noise.js"></script>
+<script src="../lib/cases.js"></script>
+<script src="../lib/textools.js"></script>
+<!-- Разбор PDF. Сам pdf.js (1,8 МБ) НЕ подключается здесь: pdftext.js
+     подтягивает его динамическим import() при первом PDF-файле.
+     Иначе полтора мегабайта грузились бы при каждом открытии вкладки,
+     а почти все разборы идут по вставленному тексту. -->
+<script src="../lib/pdftext.js"></script>
+<script src="../lib/timeline.js"></script>
+<script src="../lib/casegraph.js"></script>
+<script src="../lib/triage.js"></script>
+<script src="fox.js"></script>
+<script src="../lib/analyze.js"></script>
+<script src="newtab.js"></script>
+</body>
+</html>

@@ -1,0 +1,826 @@
+/* =============================================================================
+ * newtab.css — оформление главной вкладки
+ * Токены объявлены на :root (светлая тема), переопределяются для тёмной.
+ * Без внешних шрифтов: системный стек, чтобы страница открывалась мгновенно
+ * и не делала сетевых запросов.
+ * ========================================================================== */
+
+:root {
+  --bg:        #f6f7f9;
+  --bg-panel:  #ffffff;
+  --bg-sunken: #eef0f4;
+  --bg-hover:  #e7eaf0;
+  --fg:        #14171c;
+  --fg-muted:  #5d6675;
+  --fg-faint:  #8a93a3;
+  --border:    #d7dbe3;
+  --border-strong: #bcc3ce;
+  --accent:    #1f6feb;
+  --accent-fg: #ffffff;
+  --warn:      #b45309;
+  --danger:    #b91c1c;
+  --ok:        #15803d;
+  --internal:  #7c3aed;
+  --limited:   #b45309;
+  --public:    #0f766e;
+  --radius:    6px;
+  --mono: ui-monospace, "SF Mono", "Cascadia Mono", "JetBrains Mono", Menlo, Consolas, monospace;
+  --sans: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+
+:root:not([data-theme="light"]) {
+  color-scheme: light dark;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg:        #0d1117;
+    --bg-panel:  #141a22;
+    --bg-sunken: #0a0e14;
+    --bg-hover:  #1c2530;
+    --fg:        #e6edf3;
+    --fg-muted:  #9aa7b8;
+    --fg-faint:  #6b7787;
+    --border:    #262f3b;
+    --border-strong: #3a4553;
+    --accent:    #3b82f6;
+    --accent-fg: #ffffff;
+    --warn:      #d97706;
+    --danger:    #ef4444;
+    --ok:        #22c55e;
+    --internal:  #a78bfa;
+    --limited:   #f59e0b;
+    --public:    #2dd4bf;
+  }
+}
+
+:root[data-theme="dark"] {
+  --bg:        #0d1117;
+  --bg-panel:  #141a22;
+  --bg-sunken: #0a0e14;
+  --bg-hover:  #1c2530;
+  --fg:        #e6edf3;
+  --fg-muted:  #9aa7b8;
+  --fg-faint:  #6b7787;
+  --border:    #262f3b;
+  --border-strong: #3a4553;
+  --accent:    #3b82f6;
+  --accent-fg: #ffffff;
+  --warn:      #d97706;
+  --danger:    #ef4444;
+  --ok:        #22c55e;
+  --internal:  #a78bfa;
+  --limited:   #f59e0b;
+  --public:    #2dd4bf;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--fg);
+  font: 14px/1.5 var(--sans);
+  min-height: 100vh;
+}
+
+/* ---------------------------------------------------------------- topbar */
+.topbar {
+  display: flex; align-items: center; gap: 16px; flex-wrap: wrap;
+  padding: 10px 18px;
+  background: var(--bg-panel);
+  border-bottom: 1px solid var(--border);
+  position: sticky; top: 0; z-index: 20;
+}
+.brand { display: flex; align-items: center; gap: 8px; }
+/* Лиса в шапке: align-items у .brand переведён с baseline на center
+   специально — у canvas нет базовой линии текста, и при baseline он
+   повисает над строкой. */
+.brand-fox {
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+  opacity: .95;
+  flex: 0 0 auto;
+}
+.brand-mark {
+  font: 700 13px/1 var(--mono);
+  background: var(--accent); color: var(--accent-fg);
+  padding: 5px 7px; border-radius: 4px; letter-spacing: .5px;
+}
+.brand-name { font-weight: 600; letter-spacing: .2px; }
+.brand-ver { font: 400 11px var(--mono); color: var(--fg-faint); }
+
+.topbar-controls { margin-left: auto; display: flex; align-items: center; gap: 12px; flex-wrap: wrap; min-width: 0; max-width: 100%; }
+.tlp { display: flex; align-items: center; gap: 7px; min-width: 0; max-width: 100%; }
+.tlp-label { font-size: 12px; color: var(--fg-muted); }
+.case-badge {
+  font-size: 12px; color: var(--fg-muted);
+  border: 1px solid var(--border); border-radius: 999px; padding: 3px 11px;
+}
+.case-badge strong { color: var(--fg); }
+
+/* ---------------------------------------------------------------- layout */
+.layout {
+  display: grid;
+  grid-template-columns: 300px minmax(0, 1fr);
+  align-items: start;
+  gap: 0;
+}
+@media (max-width: 860px) {
+  .layout { grid-template-columns: 1fr; }
+  .sidebar { position: static !important; height: auto !important; max-height: 340px; border-right: 0; border-bottom: 1px solid var(--border); }
+}
+
+/* --------------------------------------------------------------- sidebar */
+.sidebar {
+  position: sticky; top: 53px;
+  height: calc(100vh - 53px);
+  display: flex; flex-direction: column;
+  background: var(--bg-panel);
+  border-right: 1px solid var(--border);
+  min-width: 0;
+}
+.sidebar-head { padding: 12px; border-bottom: 1px solid var(--border); }
+.sidebar-meta {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-top: 8px; font-size: 11px; color: var(--fg-faint);
+}
+.tree { overflow-y: auto; flex: 1; padding: 6px 0 12px; }
+
+.cat { border-bottom: 1px solid var(--border); }
+.cat-head {
+  display: flex; align-items: center; gap: 8px; width: 100%;
+  padding: 9px 12px; background: none; border: 0; cursor: pointer;
+  color: var(--fg); font: 600 12.5px var(--sans); text-align: left;
+}
+.cat-head:hover { background: var(--bg-hover); }
+.cat-caret { width: 9px; color: var(--fg-faint); transition: transform .12s; flex: none; }
+.cat.is-open .cat-caret { transform: rotate(90deg); }
+.cat-count { margin-left: auto; font: 400 11px var(--mono); color: var(--fg-faint); }
+.cat-body { display: none; padding-bottom: 4px; }
+.cat.is-open .cat-body { display: block; }
+
+.tool {
+  display: flex; align-items: center; gap: 8px; width: 100%;
+  padding: 5px 12px 5px 29px; background: none; border: 0; cursor: pointer;
+  color: var(--fg-muted); font: 400 12.5px var(--sans); text-align: left;
+}
+.tool:hover { background: var(--bg-hover); color: var(--fg); }
+.tool-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.tool-auth { font: 400 10px var(--mono); color: var(--fg-faint); margin-left: auto; flex: none; }
+
+/* Метка стоимости. Показывается в дереве, чтобы аналитик не тратил клик
+   на сервис, за которым его ждёт форма оплаты. */
+.tool-tag {
+  font: 600 10px var(--sans); letter-spacing: .2px;
+  padding: 1px 4px; border-radius: 3px; flex: none;
+  border: 1px solid var(--border-strong); color: var(--fg-faint);
+}
+.tool-tag.tag-paid { color: var(--warn); border-color: var(--warn); }
+.tool .tool-tag { margin-left: auto; }
+.tool .tool-tag + .tool-tag { margin-left: 4px; }
+.chk-mini { font-size: 11px; margin-top: 8px; }
+.tool.is-blocked { opacity: .35; cursor: not-allowed; text-decoration: line-through; }
+
+.dot { width: 7px; height: 7px; border-radius: 50%; display: inline-block; flex: none; }
+.dot-internal { background: var(--internal); }
+.dot-limited  { background: var(--limited); }
+.dot-public   { background: var(--public); }
+
+.sidebar-foot {
+  display: flex; gap: 12px; flex-wrap: wrap;
+  padding: 8px 12px; border-top: 1px solid var(--border);
+  font-size: 10.5px; color: var(--fg-faint);
+}
+.legend { display: inline-flex; align-items: center; gap: 5px; }
+
+/* ------------------------------------------------------------------ main */
+.main { padding: 18px 22px 60px; min-width: 0; }
+@media (max-width: 520px) { .main { padding: 14px 16px 40px; } }
+
+.tabs { display: flex; gap: 2px; border-bottom: 1px solid var(--border); margin-bottom: 16px; flex-wrap: wrap; }
+.tab {
+  background: none; border: 0; border-bottom: 2px solid transparent;
+  padding: 9px 14px; cursor: pointer; color: var(--fg-muted);
+  font: 500 13.5px var(--sans);
+}
+.tab:hover { color: var(--fg); }
+.tab.is-active { color: var(--fg); border-bottom-color: var(--accent); }
+
+.panel { display: none; }
+.panel.is-active { display: block; }
+.panel-hint { color: var(--fg-muted); font-size: 12.5px; margin: 0 0 14px; max-width: 78ch; }
+.panel-hint code { font: 12px var(--mono); background: var(--bg-sunken); padding: 1px 4px; border-radius: 3px; }
+
+/* ---------------------------------------------------------------- inputs */
+input[type="text"], input[type="search"], input[type="url"], select, textarea {
+  width: 100%; padding: 7px 9px;
+  background: var(--bg-sunken); color: var(--fg);
+  border: 1px solid var(--border); border-radius: var(--radius);
+  font: 13px var(--sans);
+}
+textarea { font: 12.5px/1.6 var(--mono); resize: vertical; }
+input:focus, select:focus, textarea:focus { outline: 2px solid var(--accent); outline-offset: -1px; border-color: var(--accent); }
+select { width: auto; max-width: 100%; }
+
+.input-zone { background: var(--bg-panel); border: 1px solid var(--border); border-radius: var(--radius); padding: 12px; }
+.input-zone.is-drag { border-color: var(--accent); border-style: dashed; }
+.input-actions { display: flex; align-items: center; gap: 8px; margin-top: 10px; flex-wrap: wrap; }
+.spacer { flex: 1 1 auto; }
+.parse-stat { font: 11.5px var(--mono); color: var(--fg-muted); }
+
+.btn {
+  border: 1px solid var(--border-strong); background: var(--bg-panel); color: var(--fg);
+  padding: 6px 13px; border-radius: var(--radius); cursor: pointer;
+  font: 500 12.5px var(--sans); white-space: nowrap;
+}
+.btn:hover { background: var(--bg-hover); }
+.btn-primary { background: var(--accent); border-color: var(--accent); color: var(--accent-fg); }
+.btn-primary:hover { filter: brightness(1.08); background: var(--accent); }
+.btn-ghost { border-color: transparent; background: none; color: var(--fg-muted); }
+/* Второстепенное действие. Раньше класс .btn-secondary стоял на тринадцати
+   кнопках, а правила для него в этом файле не было: тринадцать кнопок
+   выглядели как базовая .btn, и отличить «Забрать и разобрать» от
+   «Разобрать» можно было только прочитав надпись. Найдено сверкой
+   разметки со стилями. */
+.btn-secondary { border-color: var(--border-strong); color: var(--fg); }
+.btn-secondary:hover { background: var(--bg-hover); border-color: var(--accent); }
+.btn-ghost:hover { background: var(--bg-hover); color: var(--fg); }
+.btn-danger { color: var(--danger); }
+.btn-mini { padding: 2px 7px; font-size: 11px; }
+
+/* --------------------------------------------------------------- results */
+.results { margin-top: 16px; display: flex; flex-direction: column; gap: 8px; }
+
+.ioc-group-title {
+  font: 600 11px var(--sans); text-transform: uppercase; letter-spacing: .6px;
+  color: var(--fg-faint); margin: 10px 0 2px;
+}
+.ioc {
+  background: var(--bg-panel); border: 1px solid var(--border); border-radius: var(--radius);
+  overflow: hidden;
+}
+.ioc-head { display: flex; align-items: center; gap: 10px; padding: 8px 11px; cursor: pointer; }
+.ioc-head:hover { background: var(--bg-hover); }
+.ioc-type {
+  font: 600 10px var(--mono); text-transform: uppercase; letter-spacing: .4px;
+  padding: 2px 6px; border-radius: 3px; border: 1px solid var(--border-strong);
+  color: var(--fg-muted); flex: none;
+}
+.ioc-value { font: 13px var(--mono); word-break: break-all; min-width: 0; }
+.ioc-badges { margin-left: auto; display: flex; gap: 5px; flex-wrap: wrap; flex: none; }
+.badge { font: 10px var(--mono); padding: 1px 6px; border-radius: 3px; border: 1px solid var(--border-strong); color: var(--fg-muted); }
+.badge-warn { color: var(--warn); border-color: var(--warn); }
+.badge-defang { color: var(--internal); border-color: var(--internal); }
+.badge-count { color: var(--fg-faint); }
+
+.ioc-body { display: none; padding: 4px 11px 11px 11px; border-top: 1px solid var(--border); }
+
+/* Две формы склеенного значения. Показываются только у `ambiguous:wrap`:
+   пометка «это догадка» без возможности её проверить — тупик. */
+.wrap-proof { margin: 8px 0 10px; padding: 8px 10px; border-radius: var(--radius);
+              border: 1px solid var(--border); border-left: 3px solid var(--warn);
+              background: var(--bg-sunken); }
+.wrap-proof-head { font: 600 11.5px var(--sans); color: var(--warn); margin-bottom: 6px; }
+.wrap-proof-row { display: flex; gap: 10px; align-items: flex-start; margin-top: 4px; }
+.wrap-proof-label { flex: 0 0 116px; font: 11px var(--sans); color: var(--fg-muted); padding-top: 1px; }
+.wrap-proof-val { font: 11.5px/1.5 var(--mono); white-space: pre-wrap; word-break: break-all;
+                  color: var(--fg); background: none; border: 0; padding: 0; }
+.ioc.is-open .ioc-body { display: block; }
+.ioc-context { font: 11.5px var(--mono); color: var(--fg-faint); margin: 8px 0; word-break: break-word; }
+.tool-chips { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 8px; }
+.chip {
+  display: inline-flex; align-items: center; gap: 6px;
+  border: 1px solid var(--border-strong); background: var(--bg-sunken);
+  color: var(--fg); border-radius: 999px; padding: 3px 11px;
+  font: 12px var(--sans); cursor: pointer; text-decoration: none;
+}
+.chip:hover { background: var(--bg-hover); border-color: var(--accent); }
+.chip.is-selected { background: var(--accent); border-color: var(--accent); color: var(--accent-fg); }
+.chip-active-warn::after { content: "◉"; color: var(--warn); font-size: 9px; }
+.no-tools { font-size: 12px; color: var(--fg-faint); font-style: italic; }
+
+.bulk-bar {
+  position: sticky; bottom: 0; margin-top: 16px;
+  display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+  background: var(--bg-panel); border: 1px solid var(--border); border-radius: var(--radius);
+  padding: 9px 12px;
+}
+.chk { display: inline-flex; align-items: center; gap: 6px; font-size: 12.5px; color: var(--fg-muted); }
+.menu {
+  position: absolute; right: 22px; bottom: 60px; z-index: 30;
+  background: var(--bg-panel); border: 1px solid var(--border-strong);
+  border-radius: var(--radius); padding: 6px; max-height: 300px; overflow: auto;
+  box-shadow: 0 8px 24px rgba(0,0,0,.28); min-width: 240px;
+}
+.menu button { display: block; width: 100%; text-align: left; background: none; border: 0; color: var(--fg); padding: 6px 10px; border-radius: 4px; cursor: pointer; font: 12.5px var(--sans); }
+.menu button:hover { background: var(--bg-hover); }
+
+/* ---------------------------------------------------------------- global */
+.global-form { background: var(--bg-panel); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px; display: flex; flex-direction: column; gap: 14px; }
+.field { display: flex; flex-direction: column; gap: 5px; min-width: 0; }
+.field-grow { flex: 1 1 200px; }
+.field-row { display: flex; gap: 12px; flex-wrap: wrap; align-items: flex-end; }
+.field-label { font: 600 11px var(--sans); text-transform: uppercase; letter-spacing: .5px; color: var(--fg-faint); }
+.chips { display: flex; gap: 7px; flex-wrap: wrap; }
+.domain-list {
+  font: 11.5px var(--mono); color: var(--fg-muted);
+  background: var(--bg-sunken); border: 1px solid var(--border); border-radius: var(--radius);
+  padding: 9px; max-height: 130px; overflow: auto; word-break: break-all;
+}
+.muted { color: var(--fg-faint); font-weight: 400; text-transform: none; letter-spacing: 0; }
+
+/* ------------------------------------------------------------------ case */
+.case-table-wrap { margin: 14px 0; overflow-x: auto; border: 1px solid var(--border); border-radius: var(--radius); background: var(--bg-panel); }
+.case-table { width: 100%; border-collapse: collapse; font-size: 12.5px; }
+.case-table th {
+  text-align: left; padding: 8px 11px; border-bottom: 1px solid var(--border);
+  font: 600 10.5px var(--sans); text-transform: uppercase; letter-spacing: .5px; color: var(--fg-faint);
+  white-space: nowrap;
+}
+.case-table td { padding: 7px 11px; border-bottom: 1px solid var(--border); vertical-align: top; }
+.case-table tr:last-child td { border-bottom: 0; }
+.case-table td:nth-child(2) { font: 12px var(--mono); word-break: break-all; }
+.empty { padding: 22px; text-align: center; color: var(--fg-faint); font-size: 12.5px; margin: 0; }
+
+.report-out {
+  margin-top: 16px; background: var(--bg-sunken); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 14px; font: 12px/1.65 var(--mono);
+  white-space: pre-wrap; word-break: break-word; max-height: 520px; overflow: auto;
+}
+
+/* ----------------------------------------------------------------- toast */
+.toast {
+  position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+  background: var(--fg); color: var(--bg); padding: 9px 18px;
+  border-radius: 999px; font-size: 12.5px; z-index: 100;
+  box-shadow: 0 6px 20px rgba(0,0,0,.3);
+}
+
+/* Узкие экраны: гарантированный боковой отступ во всех блоках. */
+@media (max-width: 520px) {
+  .topbar { padding: 10px 16px; }
+  .sidebar-head, .sidebar-foot { padding-left: 16px; padding-right: 16px; }
+  .tool { padding-left: 30px; padding-right: 16px; }
+  .cat-head { padding-left: 16px; padding-right: 16px; }
+}
+
+/* Предупреждение о локальном хранении кейса. Не «алерт» кричащего цвета:
+   это постоянное условие работы, а не ошибка. Жёлтая полоса слева и
+   приглушённый фон — заметно, но не мешает читать каждый день. */
+.notice {
+  background: var(--bg-panel);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--warn);
+  border-radius: var(--radius);
+  padding: 11px 14px;
+  margin: 0 0 16px;
+  font-size: 12.5px;
+  line-height: 1.6;
+  color: var(--fg-muted);
+}
+.notice strong { color: var(--fg); }
+
+/* ============================================ ВТОРОЙ ЭТАП: АНАЛИЗ =====
+   Визуальный приоритет здесь у отметки подтверждения, а не у текста
+   утверждения. Аналитик должен видеть «проверено / не проверено» раньше,
+   чем прочитает саму фразу, — иначе красивая формулировка успевает
+   стать убедительной до того, как выяснится, что она выдумана. */
+.analysis {
+  margin-top: 22px;
+  padding-top: 18px;
+  border-top: 1px solid var(--border);
+}
+.analysis-head {
+  display: flex; align-items: baseline; gap: 10px;
+  flex-wrap: wrap; margin-bottom: 4px;
+}
+.analysis-title {
+  margin: 0; font-size: 13px; font-weight: 600;
+  letter-spacing: .02em; color: var(--fg);
+}
+.model-state {
+  font: 11px var(--mono); padding: 2px 8px;
+  border-radius: 999px; border: 1px solid var(--border);
+  color: var(--fg-faint); white-space: nowrap;
+}
+.model-state.is-ok  { color: var(--ok);   border-color: var(--ok); }
+.model-state.is-off { color: var(--warn); border-color: var(--warn); }
+
+.analysis-out { margin-top: 14px; display: flex; flex-direction: column; gap: 9px; }
+.analysis-context { margin: 0 0 4px; font-size: 13px; line-height: 1.65; color: var(--fg); }
+
+.notice-inline { margin-bottom: 10px; }
+
+.claim {
+  display: grid;
+  grid-template-columns: 22px 1fr;
+  gap: 2px 8px;
+  padding: 11px 13px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg-panel);
+  min-width: 0;
+}
+.claim-ok  { border-left: 3px solid var(--ok); }
+.claim-bad { border-left: 3px solid var(--danger); opacity: .72; }
+.claim-gen { border-left: 3px solid var(--warn); grid-template-columns: auto 1fr; }
+
+.claim-mark { font-size: 13px; font-weight: 700; line-height: 1.5; }
+.claim-ok  .claim-mark { color: var(--ok); }
+.claim-bad .claim-mark { color: var(--danger); }
+
+.claim-text {
+  font-size: 13px; line-height: 1.55; color: var(--fg);
+  min-width: 0; overflow-wrap: anywhere;
+}
+.claim-text code { font: 12px var(--mono); color: var(--accent); }
+.claim-sub, .claim-quote {
+  grid-column: 2; min-width: 0; overflow-wrap: anywhere;
+}
+.claim-sub { font-size: 12px; color: var(--fg-muted); line-height: 1.5; }
+.claim-quote {
+  font: 11.5px/1.6 var(--mono);
+  color: var(--fg-faint);
+  margin-top: 3px;
+}
+.claim-bad .claim-quote { color: var(--danger); }
+.claim-gen .claim-quote { color: var(--fg-muted); }
+
+.role-tag {
+  font: 10px var(--sans); text-transform: uppercase; letter-spacing: .04em;
+  padding: 1px 6px; border-radius: 3px;
+  background: var(--bg-sunken); color: var(--fg-muted);
+  border: 1px solid var(--border);
+}
+.prio {
+  font: 10px var(--sans); text-transform: uppercase; letter-spacing: .04em;
+  padding: 2px 7px; border-radius: 3px; align-self: start;
+  border: 1px solid currentColor; white-space: nowrap;
+}
+.prio-high   { color: var(--danger); }
+.prio-medium { color: var(--warn); }
+.prio-low    { color: var(--fg-faint); }
+
+.parse-stat.is-warn { color: var(--warn); }
+
+@media (max-width: 520px) {
+  .claim { grid-template-columns: 18px 1fr; padding: 10px; }
+  .claim-gen { grid-template-columns: 1fr; }
+  .claim-gen .claim-quote, .claim-gen .claim-text { grid-column: 1; }
+}
+
+/* Внешний провайдер: отдельный цвет, не «ок» и не «ошибка».
+   Это не поломка и не норма по умолчанию — это состояние, о котором
+   аналитик должен знать до того, как вставит текст. */
+.model-state.is-external { color: var(--internal); border-color: var(--internal); }
+#external-notice { border-left-color: var(--internal); }
+
+/* =============== ИСТОЧНИКИ: ССЫЛКА И КАРТИНКА ============================
+ * Предупреждение об уходящем запросе — постоянная строка под полем, а не
+ * всплывающее уведомление. Всплывающее закрывают не читая; здесь речь про
+ * условие работы, которое действует каждый раз.
+ * ====================================================================== */
+
+.src-row { display: flex; gap: 8px; align-items: flex-end; margin-top: 10px; }
+.src-row input[type="url"] {
+  width: 100%; padding: 7px 9px; font: 12.5px var(--mono);
+  background: var(--bg-sunken); color: var(--fg);
+  border: 1px solid var(--border); border-radius: var(--radius);
+}
+.src-row input[type="url"]:focus { outline: none; border-color: var(--accent); }
+
+.src-warn {
+  margin: 6px 0 0; padding: 7px 9px;
+  font: 11.5px/1.5 var(--sans); color: var(--fg-muted);
+  background: var(--bg-sunken); border-left: 3px solid var(--warn);
+  border-radius: 0 var(--radius) var(--radius) 0;
+}
+.src-warn strong { color: var(--fg); }
+.src-warn.is-off { border-left-color: var(--border-strong); }
+/* Отказ, а не предупреждение: внутренний контур забирать нельзя вообще. */
+.src-warn.is-stop { border-left-color: var(--danger); }
+.src-warn-line { margin: 0 0 5px; }
+.src-warn-line:last-child { margin-bottom: 0; }
+
+.ocr { margin-top: 12px; border-top: 1px solid var(--border); padding-top: 12px; }
+.ocr-head { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+.ocr-title { font: 600 12.5px var(--sans); }
+.ocr-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 14px; }
+@media (max-width: 900px) { .ocr-grid { grid-template-columns: 1fr; } }
+
+.ocr-shot { margin: 0; background: var(--bg-sunken); border: 1px solid var(--border); border-radius: var(--radius); padding: 6px; }
+/* Картинку не обрезаем и не растягиваем: аналитик сверяет символы,
+ * а искажённый масштаб этому прямо мешает. Высоту ограничиваем, чтобы
+ * длинный скриншот не вытеснил всё остальное со страницы. */
+.ocr-shot img { display: block; max-width: 100%; max-height: 420px; margin: 0 auto; object-fit: contain; }
+
+.ocr-side { display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+.ocr-note { margin: 0; font: 12px/1.6 var(--sans); color: var(--fg-muted); }
+.ocr-note strong { color: var(--fg); }
+.ocr-note code { font: 11.5px var(--mono); background: var(--bg-sunken); padding: 1px 4px; border-radius: 3px; }
+
+.ocr-unclear { font: 12px/1.6 var(--sans); padding: 8px 10px; border-radius: var(--radius); border-left: 3px solid; }
+.ocr-unclear.is-ok { border-left-color: var(--ok); background: var(--bg-sunken); color: var(--fg-muted); }
+.ocr-unclear.is-warn { border-left-color: var(--warn); background: var(--bg-sunken); color: var(--fg); }
+.ocr-unclear ul { margin: 6px 0 0; padding-left: 18px; }
+.ocr-unclear li { margin: 2px 0; }
+.ocr-unclear code { font: 11.5px var(--mono); word-break: break-all; }
+
+/* ================= КОМАНДНАЯ ПАЛИТРА И МОДАЛЬНЫЕ ОКНА ==================== */
+
+.overlay {
+  position: fixed; inset: 0; z-index: 90;
+  background: rgba(0, 0, 0, .55);
+  display: flex; align-items: flex-start; justify-content: center;
+  padding: 10vh 16px 16px;
+}
+/* точечное правило заменено общим — см. блок [hidden] в конце файла */
+
+.palette-box {
+  width: 100%; max-width: 640px;
+  background: var(--bg-panel); border: 1px solid var(--border-strong);
+  border-radius: 10px; box-shadow: 0 16px 48px rgba(0, 0, 0, .45);
+  overflow: hidden;
+}
+
+#palette-input {
+  width: 100%; box-sizing: border-box; padding: 14px 16px;
+  font: 14px var(--sans); background: transparent; color: var(--fg);
+  border: 0; border-bottom: 1px solid var(--border);
+}
+#palette-input:focus { outline: none; }
+
+.palette-list { max-height: 52vh; overflow-y: auto; }
+.palette-row {
+  display: flex; align-items: baseline; gap: 10px; width: 100%;
+  padding: 8px 16px; background: transparent; border: 0; cursor: pointer;
+  text-align: left; color: var(--fg); font: 13px var(--sans);
+}
+.palette-row:hover, .palette-row.is-active { background: var(--bg-hover); }
+.palette-kind {
+  font: 10px var(--sans); text-transform: uppercase; letter-spacing: .5px;
+  color: var(--fg-faint); min-width: 74px; flex: 0 0 auto;
+}
+.palette-label { flex: 0 0 auto; }
+.palette-hint {
+  font: 11px var(--sans); color: var(--fg-faint);
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1 1 auto;
+}
+.palette-foot {
+  padding: 7px 16px; border-top: 1px solid var(--border);
+  font: 11px var(--sans); color: var(--fg-faint);
+}
+.palette-foot kbd {
+  font: 10px var(--mono); background: var(--bg-sunken); color: var(--fg-muted);
+  border: 1px solid var(--border); border-radius: 3px; padding: 1px 4px; margin-right: 3px;
+}
+
+/* ================= ПЛЕЙБУКИ ============================================= */
+
+.menu-float { position: absolute; z-index: 80; min-width: 260px; max-width: 320px; }
+.ioc-playbook { margin-top: 8px; }
+.chip-btn { cursor: pointer; font: 11.5px var(--sans); }
+
+/* ================= ВЕРДИКТЫ В КЕЙСЕ ===================================== */
+
+.case-verdict, .case-input {
+  width: 100%; box-sizing: border-box; padding: 3px 5px;
+  font: 11.5px var(--sans); background: var(--bg-sunken); color: var(--fg);
+  border: 1px solid var(--border); border-radius: 3px;
+}
+.case-input { font-family: var(--mono); font-size: 11px; }
+.case-tags { margin-top: 3px; }
+.case-verdict:focus, .case-input:focus { outline: none; border-color: var(--accent); }
+.case-val { font: 11.5px var(--mono); word-break: break-all; }
+
+/* Цветом помечается ТОЛЬКО левая кромка строки. Заливка целой строки
+ * мешает читать значения, а именно их здесь и читают. */
+.case-table tbody tr { border-left: 3px solid transparent; }
+.case-table tbody tr.v-mal    { border-left-color: var(--danger); }
+.case-table tbody tr.v-sus    { border-left-color: var(--warn); }
+.case-table tbody tr.v-clean  { border-left-color: var(--ok); }
+.case-table tbody tr.v-none   { border-left-color: var(--border-strong); opacity: .65; }
+.case-table tbody tr.v-unknown { border-left-color: transparent; }
+
+/* ================= ПРЕДПРОСМОТР ЗАПРОСА ================================
+ * Появился после разбора пустой выдачи: шаблон со своими площадками
+ * склеивался с профилем, и два набора site: через И не могли совпасть.
+ * Такую ошибку по результату не диагностировать — «ничего не найдено»
+ * выглядит одинаково и при противоречивом запросе, и при честном
+ * отсутствии данных. Поэтому запрос виден ДО отправки.
+ * ====================================================================== */
+
+.query-preview {
+  margin: 10px 0 0; padding: 9px 11px;
+  background: var(--bg-sunken); border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+.qp-query {
+  display: block; font: 11.5px/1.6 var(--mono); color: var(--fg);
+  word-break: break-word; white-space: pre-wrap;
+}
+.qp-warn {
+  margin: 8px 0 0; padding-left: 9px;
+  border-left: 3px solid var(--warn);
+  font: 11.5px/1.55 var(--sans); color: var(--fg-muted);
+}
+.qp-warn:first-of-type { margin-top: 10px; }
+
+/* ================= ОТСЕЯННАЯ ОБВЯЗКА СТРАНИЦЫ ==========================
+ * Свёрнуто, но на виду. Две задачи сразу: не мешать основной выдаче
+ * и не прятать — домен вендора бывает индикатором ровно тогда, когда
+ * взломали вендора.
+ * ====================================================================== */
+
+.noise-group {
+  margin-top: 14px; border: 1px dashed var(--border-strong);
+  border-radius: var(--radius); background: var(--bg-sunken);
+}
+.noise-group summary {
+  padding: 8px 11px; cursor: pointer;
+  font: 12px var(--sans); color: var(--fg-muted);
+}
+.noise-group summary::-webkit-details-marker { display: none; }
+.noise-hint { color: var(--fg-faint); }
+.noise-body { padding: 0 11px 11px; display: flex; flex-direction: column; gap: 5px; }
+.noise-row { display: flex; align-items: center; gap: 8px; }
+.noise-val { font: 11.5px var(--mono); color: var(--fg-muted); word-break: break-all; flex: 1 1 auto; }
+.noise-why { font: 10.5px var(--sans); color: var(--fg-faint); white-space: nowrap; }
+.noise-body .btn { align-self: flex-start; margin-top: 6px; }
+
+/* ================= ОГОВОРКИ ПО ЗАБРАННОЙ СТРАНИЦЕ ======================
+ * «0 индикаторов» — утверждение о странице. Если статью не прочитали,
+ * утверждать нечего, и об этом надо сказать заметно: разница между
+ * «их там нет» и «мы не прочитали» решает, пойдёт аналитик дальше
+ * или закроет вопрос.
+ * ====================================================================== */
+
+.fetch-notes { margin-top: 10px; display: flex; flex-direction: column; gap: 6px; }
+.fetch-note {
+  margin: 0; padding: 9px 11px;
+  font: 12px/1.6 var(--sans); color: var(--fg);
+  background: var(--bg-sunken);
+  border-left: 3px solid var(--warn);
+  border-radius: 0 var(--radius) var(--radius) 0;
+}
+
+/* ================= ЗАСТАВКА ПУСТОГО СОСТОЯНИЯ =========================
+ * Показывается, пока ничего не разбирали. При первом результате
+ * исчезает: место рядом с индикаторами занимать нельзя.
+ * ====================================================================== */
+
+.idle-fox {
+  display: flex; flex-direction: column; align-items: center; gap: 10px;
+  padding: 44px 16px 52px; text-align: center;
+}
+.fox-canvas {
+  image-rendering: pixelated;          /* пиксель остаётся пикселем */
+  image-rendering: crisp-edges;
+  opacity: .92;
+}
+.idle-hint { margin: 0; font: 13px var(--sans); color: var(--fg-muted); }
+.idle-keys { margin: 0; font: 11.5px var(--mono); color: var(--fg-faint); }
+
+/* ------------------------------------------------------------ хронология */
+/* Свёрнута по умолчанию: во время работы хронология не нужна, нужна
+   при передаче смены и при возврате к кейсу через неделю. */
+.timeline-box {
+  border: 1px solid var(--border); border-radius: var(--radius);
+  background: var(--bg-panel); margin: 12px 0; padding: 0;
+}
+.timeline-box > summary {
+  cursor: pointer; padding: 9px 12px; display: flex; align-items: center; gap: 8px;
+  font-size: 13px; color: var(--fg-muted); user-select: none;
+}
+.timeline-box > summary::-webkit-details-marker { display: none; }
+.timeline-box[open] > summary { border-bottom: 1px solid var(--border); }
+.timeline-body { padding: 10px 12px 2px; max-height: 340px; overflow: auto; }
+.timeline-day {
+  font: 600 11px var(--mono); color: var(--fg-faint);
+  text-transform: uppercase; letter-spacing: .4px; margin: 8px 0 5px;
+}
+.timeline-list { list-style: none; margin: 0 0 6px; padding: 0; }
+.timeline-list li {
+  display: flex; gap: 10px; align-items: baseline;
+  padding: 3px 0; border-bottom: 1px solid var(--border-faint, transparent);
+}
+.timeline-time { font: 11px var(--mono); color: var(--fg-faint); flex: 0 0 auto; }
+.timeline-text { font-size: 12.5px; line-height: 1.5; white-space: pre-wrap; word-break: break-word; }
+.timeline-note {
+  margin: 0; padding: 8px 12px 11px; font-size: 11.5px;
+  color: var(--fg-faint); line-height: 1.55;
+}
+
+/* -------------------------------------------------- инструменты текста */
+.textools {
+  border: 1px solid var(--border); border-radius: var(--radius);
+  background: var(--bg-panel); margin: 0 0 14px;
+}
+.textools > summary {
+  cursor: pointer; padding: 8px 12px; font-size: 12.5px;
+  color: var(--fg-muted); user-select: none;
+}
+.textools > summary::-webkit-details-marker { display: none; }
+.textools[open] > summary { border-bottom: 1px solid var(--border); }
+.textools-body { padding: 10px 12px 4px; }
+.textools-note {
+  margin: 8px 0 0; font-size: 12px; line-height: 1.5;
+  color: var(--fg); border-left: 3px solid var(--accent);
+  padding: 6px 10px; background: var(--bg-sunken); border-radius: 0 var(--radius) var(--radius) 0;
+}
+.textools-note.is-warn { border-left-color: var(--warn); }
+.textools-out { margin-top: 8px; }
+.textools-out table { border-collapse: collapse; width: 100%; }
+.textools-out td {
+  padding: 3px 8px 3px 0; font: 12px var(--mono);
+  border-bottom: 1px solid var(--border); word-break: break-all;
+}
+.textools-out td:first-child { color: var(--fg-faint); white-space: nowrap; width: 1%; }
+.textools-hint { margin: 10px 0 8px; font-size: 11.5px; color: var(--fg-faint); line-height: 1.5; }
+
+/* ------------------------------------------------------------ кейсы */
+/* Название активного кейса в шапке. Нужно потому, что кейсов несколько,
+   а на вкладке умного поиска их списка не видно. */
+.case-name {
+  font-size: 12px; padding: 3px 11px; border-radius: 999px;
+  border: 1px solid var(--border); color: var(--fg-muted);
+  max-width: 26ch; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.case-name.is-empty { border-color: var(--warn); color: var(--warn); }
+.case-bar { align-items: flex-end; gap: 8px; }
+.case-warn {
+  margin: 0 0 10px; padding: 7px 11px; font-size: 12.5px; line-height: 1.5;
+  color: var(--warn); border: 1px solid var(--warn); border-radius: var(--radius);
+  background: var(--bg-sunken);
+}
+.case-migrated {
+  margin: 0 0 10px; padding: 7px 11px; font-size: 12px; line-height: 1.55;
+  color: var(--fg-muted); border-left: 3px solid var(--accent);
+  background: var(--bg-sunken); border-radius: 0 var(--radius) var(--radius) 0;
+}
+/* Индикатор, уже лежащий в активном кейсе. Не скрывается — показывается
+   приглушённым: аналитик должен видеть, что он в выдаче есть. */
+.ioc-card.in-case { opacity: .72; }
+.in-case-mark {
+  font-size: 11px; color: var(--ok); border: 1px solid var(--ok);
+  border-radius: 3px; padding: 0 4px; margin-left: 6px; white-space: nowrap;
+}
+.tt-diff { margin-top: 10px; padding: 10px; border: 1px solid var(--border);
+           border-radius: var(--radius); background: var(--bg-sunken); }
+.tt-diff textarea { width: 100%; font: 12px var(--mono); }
+
+/* ============================== hidden ==================================
+ * Атрибут hidden обязан скрывать элемент ВСЕГДА.
+ *
+ * Браузер задаёт [hidden] { display: none } в своей таблице, а любое
+ * авторское правило с display её перебивает. Поэтому `el.hidden = true`
+ * на элементе с классом, у которого прописан display:flex, не делает
+ * ничего — и это не видно в коде: строка «скрыть» есть, элемент на месте.
+ *
+ * Так на пустом стартовом экране висела панель «Выбрать все · Добавить
+ * в кейс · Плейбук…» — кнопки, которым не над чем работать; и так же
+ * не скрывался блок оговорок по забранной странице. Раньше это чинили
+ * точечно (.overlay[hidden]) — то есть по одному классу на обнаруженный
+ * случай. Здесь правило одно и на все.
+ * ==================================================================== */
+[hidden] { display: none !important; }
+
+/* ======================== СХЕМА КЕЙСА ==================================
+   Раскладка двудольная и детерминированная — см. renderGraph в newtab.js.
+   Цветом здесь кодируется только вердикт узла; сами линии различаются
+   начертанием, а не цветом: на распечатанном в оттенках серого отчёте
+   цветовая кодировка исчезает, а штрих остаётся. */
+.graph-body { overflow-x: auto; padding: 4px 0 2px; }
+.case-graph { width: 100%; height: auto; display: block; }
+.gn { font: 11.5px var(--mono); fill: var(--fg-muted); cursor: pointer; }
+.gn:hover { fill: var(--fg); text-decoration: underline; }
+.gn-src { font-family: var(--sans); font-size: 11.5px; fill: var(--fg); }
+.gn-ioc.v-malicious { fill: var(--danger); }
+.gn-ioc.v-suspicious { fill: var(--warn); }
+.gn-ioc.v-clean { fill: var(--ok); }
+.ge { fill: none; stroke: var(--border-strong); stroke-width: 1.2; pointer-events: none; }
+/* Невидимая широкая копия линии: по штриху в один пиксель мышью не попасть,
+   и клик «по ребру» не срабатывал бы вовсе. */
+.ge-hit { fill: none; stroke: transparent; stroke-width: 12; cursor: pointer; }
+.ge-hit:hover + .ge, .ge-hit:hover { stroke: transparent; }
+
+.ge-part-of { stroke-dasharray: 3 3; stroke: var(--accent); }
+.ge-key { display: inline-block; width: 22px; height: 0; border-top: 1.5px solid var(--border-strong);
+          vertical-align: middle; margin: 0 4px 0 10px; }
+.ge-key-part { border-top-style: dashed; border-top-color: var(--accent); }
+.graph-legend { font: 11px var(--sans); color: var(--fg-faint); margin: 6px 0 0; }
+.graph-detail { font: 11.5px var(--sans); color: var(--fg-muted); margin: 8px 0 0;
+                padding: 6px 9px; border-left: 3px solid var(--accent);
+                background: var(--bg-sunken); border-radius: 0 var(--radius) var(--radius) 0; }
+.graph-cut { font: 11px var(--sans); color: var(--warn); margin: 6px 0 0; }
+
+/* ======================= ВХОДЯЩИЕ НА ТРИАЖ ============================= */
+.triage-row { display: flex; align-items: center; gap: 8px; padding: 3px 0;
+              border-bottom: 1px solid var(--border); }
+.triage-row:last-child { border-bottom: 0; }
+.triage-val { font: 11.5px var(--mono); word-break: break-all; flex: 1 1 auto; }
+.triage-src { font: 10.5px var(--sans); color: var(--fg-faint); flex: 0 0 auto; }
+.triage-note { font: 11px var(--sans); color: var(--fg-faint); margin: 8px 0 0; line-height: 1.5; }
+
+.build-ver { margin-left: auto; font: 11px var(--mono); color: var(--fg-muted); opacity: .75; }

@@ -1,0 +1,28 @@
+pdf.js — извлечение текста из PDF на машине аналитика.
+
+Пакет:    pdfjs-dist 6.3.289, сборка legacy (package/legacy/build)
+Лицензия: Apache-2.0, файл LICENSE рядом
+Файлы:    pdf.min.mjs (448 КБ) — API, грузится страницей расширения
+          pdf.worker.min.mjs (1,3 МБ) — разбор, работает в Worker
+
+ПОЧЕМУ LEGACY-СБОРКА
+Обычная сборка рассчитана на свежие браузеры. Разница в целевом наборе
+возможностей, а не в функциональности разбора текста — она одинакова.
+
+ПОЧЕМУ РЯДОМ ЛЕЖИТ shim.mjs
+Обе сборки pdf.js используют Promise.withResolvers() — это Firefox 121+.
+В манифесте расширения strict_min_version = 115.0, и на таком браузере
+pdf.js упал бы с TypeError в первой же операции. shim.mjs добавляет
+недостающий метод (восемь строк по спецификации) и только потом
+подключает pdf.js. Тот же shim нужен и внутри Worker — отсюда
+worker-shim.mjs.
+
+Сами файлы pdf.js НЕ ПРАВЛЕНЫ: их надо уметь заменить на новую версию
+одной командой, не разыскивая внесённые правки.
+
+КАК ОБНОВИТЬ
+  npm pack pdfjs-dist@<версия>
+  tar xzf pdfjs-dist-<версия>.tgz
+  cp package/legacy/build/pdf.min.mjs package/legacy/build/pdf.worker.min.mjs .
+  cp package/LICENSE .
+  node extension/lib/pdftext.test.js      # разбирает настоящий PDF

@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="dark">
+<head>
+  <meta charset="utf-8">
+  <title>TI Console</title>
+  <!--
+    БОКОВАЯ ПАНЕЛЬ (sidebar_action — Firefox-only API).
+    Здесь и решается исходная проблема «сто вкладок»: результат разбора
+    страницы живёт рядом со страницей, а не в отдельной вкладке, и не
+    теряется при переходе по ссылкам.
+  -->
+  <link rel="stylesheet" href="../newtab/newtab.css">
+  <style>
+    body { font-size: 13px; }
+    .panel-wrap { padding: 10px 12px 24px; }
+    .panel-head { display:flex; align-items:center; gap:8px; margin-bottom:10px; flex-wrap:wrap; }
+    .panel-src { font: 11px var(--mono); color: var(--fg-faint); word-break: break-all; margin: 0 0 10px; }
+    .p-ioc { border:1px solid var(--border); border-radius:var(--radius); margin-bottom:6px; background:var(--bg-panel); }
+    .p-ioc summary { padding:6px 9px; cursor:pointer; display:flex; gap:7px; align-items:center; }
+    .p-ioc summary::-webkit-details-marker { display:none; }
+    .p-val { font:12px var(--mono); word-break:break-all; }
+    .p-body { padding:0 9px 9px; }
+    .p-host { border:1px solid var(--border); border-left:3px solid var(--accent);
+              border-radius:var(--radius); padding:7px 9px; margin:0 0 10px; background:var(--bg-panel); }
+    .p-host-line { display:flex; align-items:center; gap:8px; }
+    .p-host-name { font:12px var(--mono); word-break:break-all; flex:1 1 auto; }
+    .p-host-ips { margin-top:6px; display:flex; flex-direction:column; gap:5px; }
+    .p-host-ip { font:12px var(--mono); display:flex; gap:6px; align-items:center; flex-wrap:wrap; }
+    .p-host-note { font:11px var(--sans); color:var(--fg-muted); margin-top:6px; line-height:1.5; }
+    .p-idle { display:flex; flex-direction:column; align-items:center; gap:8px;
+              padding:26px 8px 32px; text-align:center; }
+    .p-idle .empty { margin:0; line-height:1.6; }
+    /* hidden обязан скрывать: авторский display перебивает правило браузера.
+       Из-за этого панель показывала «нажмите кнопку TI» поверх найденных
+       индикаторов. Правило одно на все элементы — см. newtab.css. */
+    [hidden] { display:none !important; }
+  </style>
+</head>
+<body>
+<div class="panel-wrap">
+  <div class="panel-head">
+    <strong>Найдено на странице</strong>
+    <span class="badge badge-count" id="p-count">0</span>
+    <span class="spacer"></span>
+    <select id="p-tlp" title="Режим данных">
+      <option value="public">публичные</option>
+      <option value="client">клиентские</option>
+    </select>
+  </div>
+
+  <p class="panel-src" id="p-src"></p>
+
+  <!-- ============ ХОСТ ТЕКУЩЕЙ СТРАНИЦЫ ============
+       Замена расширения Country Flags & IP Whois, но честная: страну
+       и ASN без внешнего запроса или своей базы получить нельзя,
+       поэтому показывается то, что определяется локально, а остальное
+       открывается по клику. Подробности — в panel.js. -->
+  <div class="p-host" id="p-host" hidden>
+    <div class="p-host-line">
+      <span class="p-host-name" id="p-host-name"></span>
+      <button class="btn btn-mini btn-ghost" id="p-host-resolve" title="Резолв средствами браузера, без внешних запросов">резолв</button>
+      <!-- Локальное исключение. Только ДОБАВЛЯЕТ запрет: снять то, что
+           запрещено политикой SOC, отсюда нельзя — иначе барьер перед
+           внутренними системами перестал бы быть гарантией. -->
+      <button class="btn btn-mini btn-ghost" id="p-host-deny"
+              title="Больше не разбирать страницы этого сайта. Список хранится только в этом браузере">не сканировать</button>
+    </div>
+    <p class="p-host-note" id="p-deny-note" hidden></p>
+    <div class="p-host-ips" id="p-host-ips"></div>
+  </div>
+
+  <div class="input-actions" style="margin:0 0 10px">
+    <button class="btn btn-mini btn-primary" id="p-rescan">Пересканировать</button>
+    <button class="btn btn-mini" id="p-copy">Копировать все</button>
+    <button class="btn btn-mini" id="p-case">В кейс</button>
+    <button class="btn btn-mini btn-ghost" id="p-clear">Снять подсветку</button>
+  </div>
+
+  <div id="p-list"></div>
+
+  <!-- Пустое состояние панели. Раньше здесь была одна строка текста:
+       панель выглядела сломанной, хотя просто ждала нажатия кнопки.
+       Лиса — та же, что на пустой выдаче консоли, только мельче;
+       анимация останавливается, когда панель не видна. -->
+  <div class="p-idle" id="p-empty">
+    <canvas class="fox-canvas" id="p-fox" aria-hidden="true"></canvas>
+    <p class="empty">Нажмите кнопку TI на панели инструментов,<br>чтобы разобрать открытую страницу.</p>
+  </div>
+</div>
+
+<!-- cases.js обязателен: «В кейс» из панели пишет в общее хранилище
+     кейсов через TICases.addItemsToActive. Без него кнопка молча теряла
+     работу аналитика — см. комментарий в panel.js. -->
+<script src="../lib/compat.js"></script>
+<script src="../lib/ioc.js"></script>
+<script src="../lib/cases.js"></script>
+<script src="../newtab/fox.js"></script>
+<script src="panel.js"></script>
+</body>
+</html>

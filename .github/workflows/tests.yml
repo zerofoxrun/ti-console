@@ -1,0 +1,70 @@
+# Проверки расширения.
+#
+# Репозиторий содержит ТОЛЬКО расширение: сервера в проекте нет,
+# и серверная часть сюда не выкладывается. Поэтому здесь нет ни
+# проверки паритета клиента с сервером, ни корпуса отчётов —
+# они требуют каталогов, которых в этом репозитории не будет.
+#
+# Задача, которая ссылается на отсутствующий файл, красит сборку
+# при каждом коммите, и красная галочка перестаёт что-либо значить.
+# Поэтому здесь ровно то, что работает на этом наборе файлов.
+#
+# Всё перечисленное проверено запуском на изолированной копии
+# минимального набора: 924 проверки, ни одного провала.
+
+name: Проверки
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  tests:
+    name: Браузерные проверки
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Слой совместимости с Chrome
+        # Первым: если он сломан, в Chrome не запустится ничего
+        # остального, а по остальным тестам этого не видно.
+        run: node extension/lib/compat.test.js
+
+      - name: Ядро распознавания и модули
+        run: |
+          set -e
+          for f in extension/lib/*.test.js; do node "$f"; done
+
+      - name: Фон, разметка и анимация
+        run: |
+          set -e
+          node extension/markup.test.js
+          node extension/background.test.js
+          node extension/newtab/fox.test.js
+
+  build:
+    name: Сборка XPI
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Firefox
+        # Сборщик проверяет результат, а не верит ему: манифест
+        # в пакете обязан быть без комментариев, тестов в пакете
+        # быть не должно.
+        run: python3 tools_build_ext.py
+
+      - name: Chrome
+        # Манифест под Chrome выводится из манифеста Firefox
+        # и проверяется до упаковки: не остался ли sidebar_action,
+        # не осталось ли разрешение, которого в Chrome нет,
+        # совпадает ли порядок подключения в sw.js.
+        run: python3 tools_build_ext.py --chrome

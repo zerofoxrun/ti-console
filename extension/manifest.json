@@ -1,0 +1,100 @@
+{
+  "manifest_version": 3,
+  "default_locale": "en",
+  "name": "__MSG_extName__",
+  "short_name": "TI",
+  "version": "0.59.0",
+  "description": "__MSG_extDesc__",
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "{7b1f0c6e-3a4d-4a27-9c51-0f2c9b8e5d31}",
+      "strict_min_version": "140.0",
+      "data_collection_permissions": {
+        "required": [
+          "none"
+        ]
+      }
+    }
+  },
+  "permissions": [
+    "storage",
+    "contextMenus",
+    "activeTab",
+    "scripting",
+    "tabs",
+    "browserSettings",
+    "dns",
+    "notifications"
+  ],
+  "commands": {
+    "parse-page": {
+      "suggested_key": {
+        "default": "Ctrl+Shift+1"
+      },
+      "description": "Разобрать открытую страницу на индикаторы"
+    },
+    "parse-selection": {
+      "suggested_key": {
+        "default": "Ctrl+Shift+2"
+      },
+      "description": "Разобрать выделенный текст"
+    },
+    "open-console": {
+      "suggested_key": {
+        "default": "Ctrl+Shift+3"
+      },
+      "description": "Открыть консоль TI"
+    }
+  },
+  "optional_host_permissions": [
+    "<all_urls>",
+    "https://lolbas-project.github.io/*",
+    "https://gtfobins.github.io/*",
+    "https://gtfobins.org/*"
+  ],
+  "action": {
+    "default_popup": "popup/popup.html",
+    "default_title": "TI Console: разобрать значение или страницу",
+    "default_icon": {
+      "48": "icons/icon-48.png",
+      "96": "icons/icon-96.png",
+      "128": "icons/icon-128.png"
+    }
+  },
+  "sidebar_action": {
+    "default_title": "TI Console",
+    "default_panel": "panel/panel.html",
+    "default_icon": {
+      "48": "icons/icon-48.png",
+      "96": "icons/icon-96.png",
+      "128": "icons/icon-128.png"
+    },
+    "open_at_install": false
+  },
+  "chrome_url_overrides": {
+    "newtab": "newtab/newtab.html"
+  },
+  "background": {
+    "scripts": [
+      "locales/en.js",
+      "lib/i18n.js",
+      "lib/compat.js",
+      "lib/ioc.js",
+      "lib/attack.js",
+      "lib/ownranges.js",
+      "lib/cases.js",
+      "lib/pivot.js",
+      "lib/triage.js",
+      "lib/capture.js",
+      "background.js"
+    ]
+  },
+  "icons": {
+    "48": "icons/icon-48.png",
+    "96": "icons/icon-96.png",
+    "128": "icons/icon-128.png"
+  },
+  "content_security_policy": {
+    "extension_pages": "script-src 'self'; object-src 'none'; connect-src 'self' https:"
+  }
+}

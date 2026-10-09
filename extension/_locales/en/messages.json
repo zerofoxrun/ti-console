@@ -1,0 +1,10 @@
+{
+  "extName": {
+    "message": "TI Console",
+    "description": "Extension name shown in the browser and in the store."
+  },
+  "extDesc": {
+    "message": "Threat-intel analyst workbench: parse reports, e-mails and HAR into indicators, ATT&CK matrix, case, report skeleton, rule drafts.",
+    "description": "Short description. Chrome Web Store limit is 132 characters."
+  }
+}

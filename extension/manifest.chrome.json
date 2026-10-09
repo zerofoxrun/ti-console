@@ -1,0 +1,69 @@
+{
+  "manifest_version": 3,
+  "default_locale": "en",
+  "name": "__MSG_extName__",
+  "short_name": "TI",
+  "version": "0.59.0",
+  "description": "__MSG_extDesc__",
+  "permissions": [
+    "storage",
+    "contextMenus",
+    "activeTab",
+    "scripting",
+    "tabs",
+    "notifications",
+    "sidePanel"
+  ],
+  "commands": {
+    "parse-page": {
+      "suggested_key": {
+        "default": "Ctrl+Shift+1"
+      },
+      "description": "Разобрать открытую страницу на индикаторы"
+    },
+    "parse-selection": {
+      "suggested_key": {
+        "default": "Ctrl+Shift+2"
+      },
+      "description": "Разобрать выделенный текст"
+    },
+    "open-console": {
+      "suggested_key": {
+        "default": "Ctrl+Shift+3"
+      },
+      "description": "Открыть консоль TI"
+    }
+  },
+  "optional_host_permissions": [
+    "<all_urls>",
+    "https://lolbas-project.github.io/*",
+    "https://gtfobins.github.io/*",
+    "https://gtfobins.org/*"
+  ],
+  "action": {
+    "default_popup": "popup/popup.html",
+    "default_title": "TI Console: разобрать значение или страницу",
+    "default_icon": {
+      "48": "icons/icon-48.png",
+      "96": "icons/icon-96.png",
+      "128": "icons/icon-128.png"
+    }
+  },
+  "chrome_url_overrides": {
+    "newtab": "newtab/newtab.html"
+  },
+  "background": {
+    "service_worker": "sw.js"
+  },
+  "icons": {
+    "48": "icons/icon-48.png",
+    "96": "icons/icon-96.png",
+    "128": "icons/icon-128.png"
+  },
+  "content_security_policy": {
+    "extension_pages": "script-src 'self'; object-src 'none'; connect-src 'self' https:"
+  },
+  "side_panel": {
+    "default_path": "panel/panel.html"
+  }
+}

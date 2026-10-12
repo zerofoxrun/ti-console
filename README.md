@@ -187,7 +187,7 @@ reproduced from the sources in this repository.
 
 ## Status
 
-Version 0.62.1. The extension is feature-complete for the workflow it
+Version 0.63.0. The extension is feature-complete for the workflow it
 describes and is in daily use. Interface localisation covers 1532 strings
 in English and Russian.
 

@@ -3,6 +3,46 @@
 Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 Versions are [semantic](https://semver.org/).
 
+## [0.63.0] — 2026-10-12
+
+Source search is no longer Russian-first when the interface is English.
+
+### Why
+
+In direct mode — without SearXNG — a search engine accepts only so many
+`site:` operators, so the extension takes the first eight entries of the
+profile. That order was written for a Russian-speaking analyst: in three
+profiles out of six, more than half of those eight were Russian-language
+sites. With an English interface that produced a search mostly over the
+Russian-speaking web, and it produced it silently: there were results,
+just not the right ones.
+
+Appending international sources to the end of each list would not have
+fixed it. They would never reach direct mode — which is what the comment
+above that list has said all along.
+
+### Added
+- 43 international sources across the six profiles: vendor research
+  (Akamai, ReversingLabs, DomainTools, Lab52, nao-sec, Censys, Hunt.io,
+  Silent Push, VirusTotal, Yoroi), CERTs (Switzerland, New Zealand,
+  Brazil, India, Korea, Singapore, Austria, Israel), vulnerabilities
+  (CVE Details, OpenCVE, Vulmon, Debian, Red Hat, Ubuntu, Palo Alto),
+  community (The Register, Help Net Security, Security Affairs,
+  DataBreaches.net, vx-underground, Lobsters, Cybersecurity Dive),
+  detection (SigmaHQ, Atomic Red Team, HijackLibs, LOTS, filesec,
+  MalAPI, LOLDrivers) and paste sites.
+
+### Changed
+- Each profile now declares which of its sites are Russian-language, and
+  the order depends on the interface language. The rule is asymmetric on
+  purpose. For a Russian interface the order is unchanged — the core
+  there is a deliberate mix, and English-language research is what a
+  Russian-speaking analyst needs most. For an English interface the
+  Russian-language sites move out of the core and into the tail: an
+  analyst who cannot read them gains nothing from spending the eight
+  slots on them. Nothing is removed from any profile, and with SearXNG,
+  where there is no limit, every site is still queried.
+
 ## [0.62.1] — 2026-10-12
 
 ### Fixed

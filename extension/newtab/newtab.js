@@ -176,6 +176,17 @@ const SEARCH_PROFILES = [
       'blog.nviso.eu', 'asec.ahnlab.com', 'harfanglab.io/insidethelab',
       'blog.eclecticiq.com', 'rapid7.com/blog', 'trellix.com/blogs/research',
       'esentire.com/blog', 'cybereason.com/blog', 'malwarebytes.com/blog',
+      // --- добавлено в 0.63.0: международные площадки ---
+      'akamai.com/blog/security-research', 'blog.reversinglabs.com',
+      'domaintools.com/resources/blog', 'lab52.io', 'nao-sec.org', 'censys.com/blog',
+      'hunt.io/blog', 'silentpush.com/blog', 'blog.virustotal.com', 'yoroi.company/research',
+    ],
+    /* Русскоязычные площадки этого профиля. Нужны не для
+     * фильтрации, а для порядка: см. площадкиПрофиля(). */
+    ru: [
+      'securelist.ru', 'rt-solar.ru', 'bi.zone', 'f6.ru', 'ptsecurity.com',
+      'news.drweb.ru', 'kaspersky.ru/blog', 'angarasecurity.ru', 'jet.su',
+      'cyberok.ru', 'infowatch.ru',
     ],
   },
   {
@@ -192,6 +203,15 @@ const SEARCH_PROFILES = [
       'us-cert.cisa.gov', 'enisa.europa.eu', 'bsi.bund.de', 'cert.ssi.gouv.fr',
       'ncsc.nl', 'cyber.gc.ca', 'cyber.gov.au', 'cert.pl', 'cert.be',
       'ncsc.gov.ie', 'first.org',
+      // --- добавлено в 0.63.0: международные площадки ---
+      'govcert.ch', 'ncsc.govt.nz', 'cert.br', 'cert-in.org.in', 'krcert.or.kr',
+      'csa.gov.sg', 'cert.at', 'cert.gov.il',
+    ],
+    /* Русскоязычные площадки этого профиля. Нужны не для
+     * фильтрации, а для порядка: см. площадкиПрофиля(). */
+    ru: [
+      'bdu.fstec.ru', 'safe-surf.ru', 'cert.gov.ru', 'nkcki.ru', 'fstec.ru',
+      'cbr.ru', 'fincert.cbr.ru',
     ],
   },
   {
@@ -208,6 +228,14 @@ const SEARCH_PROFILES = [
       'mozilla.org/en-US/security/advisories', 'seclists.org/fulldisclosure',
       'github.com/advisories', 'cisa.gov/known-exploited-vulnerabilities-catalog',
       'vulncheck.com/blog', 'cyberok.ru',
+      // --- добавлено в 0.63.0: международные площадки ---
+      'cvedetails.com', 'opencve.io', 'vulmon.com', 'security-tracker.debian.org',
+      'access.redhat.com/security', 'ubuntu.com/security/notices', 'security.paloaltonetworks.com',
+    ],
+    /* Русскоязычные площадки этого профиля. Нужны не для
+     * фильтрации, а для порядка: см. площадкиПрофиля(). */
+    ru: [
+      'bdu.fstec.ru', 'cyberok.ru',
     ],
   },
   {
@@ -221,6 +249,13 @@ const SEARCH_PROFILES = [
       // --- остальное ---
       'bitbucket.org', 'ghostbin.com', 'dpaste.org', 'searchcode.com',
       'gitee.com', 'codeberg.org', 'huggingface.co', 'habr.com/ru/companies',
+      // --- добавлено в 0.63.0: международные площадки ---
+      'paste.ee', 'justpaste.it', 'telegra.ph', 'codepen.io',
+    ],
+    /* Русскоязычные площадки этого профиля. Нужны не для
+     * фильтрации, а для порядка: см. площадкиПрофиля(). */
+    ru: [
+      'habr.com/ru/companies',
     ],
   },
   {
@@ -238,6 +273,15 @@ const SEARCH_PROFILES = [
       'news.ycombinator.com', 'securityweek.com', 'thehackernews.com',
       'krebsonsecurity.com', 'darkreading.com', 'risky.biz',
       'isc.sans.edu', 'malware.news', 'cyberscoop.com',
+      // --- добавлено в 0.63.0: международные площадки ---
+      'theregister.com', 'helpnetsecurity.com', 'securityaffairs.com',
+      'databreaches.net', 'vx-underground.org', 'lobste.rs', 'cybersecuritydive.com',
+    ],
+    /* Русскоязычные площадки этого профиля. Нужны не для
+     * фильтрации, а для порядка: см. площадкиПрофиля(). */
+    ru: [
+      'habr.com', 'anti-malware.ru', 'securitylab.ru', 'xakep.ru', 'cisoclub.ru',
+      'itsec.ru',
     ],
   },
   {
@@ -254,9 +298,52 @@ const SEARCH_PROFILES = [
       'car.mitre.org', 'sigconverter.io', 'd3fend.mitre.org',
       'redcanary.com/threat-detection-report', 'attackerkb.com',
       'uncoder.io', 'socprime.com',
+      // --- добавлено в 0.63.0: международные площадки ---
+      'sigmahq.io', 'atomicredteam.io', 'hijacklibs.net', 'lots-project.com',
+      'filesec.io', 'malapi.io', 'loldrivers.io',
     ],
+    ru: [],
   },
 ];
+
+/* ПОРЯДОК ПЛОЩАДОК ЗАВИСИТ ОТ ЯЗЫКА ИНТЕРФЕЙСА.
+ *
+ * В прямом режиме в запрос влезает восемь площадок — первые по порядку.
+ * Порядок в файле составлен под русскоязычного аналитика, и в ядре трёх
+ * профилей из шести больше половины занимают русские источники. Для
+ * английского интерфейса это означает поиск преимущественно по рунету,
+ * причём незаметно: выдача есть, просто не та.
+ *
+ * Дописать международные площадки в конец списка было бы не решением,
+ * а имитацией: до прямого режима они не доходят никогда.
+ *
+ * Поэтому список один, а порядок два. Состав не меняется: площадки
+ * другого языка уходят во вторую группу, а не исчезают — при SearXNG
+ * и при лимите 0 в запрос идут все, как и раньше. Внутри каждой группы
+ * порядок из файла сохраняется, он там осмысленный.
+ */
+function площадкиПрофиля(профиль) {
+  if (!профиль) return [];
+  const все = профиль.domains || [];
+  /* Язык читается у i18n, а не из настроек напрямую: там он уже
+   * приведён к 'ru' | 'en' и переживает отсутствие значения. */
+  const русский = !(globalThis.TII18n && TII18n.язык
+                    && TII18n.язык() !== 'ru');
+  /* Правило НЕСИММЕТРИЧНО, и это не упущение.
+   *
+   * Русскому аналитику англоязычные источники нужны: первичные разборы
+   * выходят в основном на английском. Поэтому для русского интерфейса
+   * порядок остаётся файловым — там ядро собрано осознанной смесью,
+   * и трогать её нечем улучшить.
+   *
+   * Англоязычному аналитику русскоязычный блог бесполезен: он его
+   * не прочитает. Поэтому для английского интерфейса русские площадки
+   * уходят из ядра во вторую группу — но остаются в списке и попадают
+   * в запрос через SearXNG, где лимита нет. */
+  if (русский) return все.slice();
+  const рус = new Set(профиль.ru || []);
+  return все.filter((d) => !рус.has(d)).concat(все.filter((d) => рус.has(d)));
+}
 
 /* ----------------------------------------------------------- СОСТОЯНИЕ -- */
 const state = {
@@ -327,6 +414,14 @@ const state = {
 
 const $  = (sel) => document.querySelector(sel);
 const $$ = (sel) => Array.from(document.querySelectorAll(sel));
+/* Разметка собирается узлами (lib/dom.js). В консоль попадают значения
+ * с чужих страниц — тип, флаги разбора, метка диапазона из политики, —
+ * а у страницы расширения есть доступ к browser.*. */
+const эл = TIDom.эл;
+/* Цвет точки у сервиса. Та же функция есть в панели: выражение
+ * повторялось в трёх местах, и разойтись им ничего не мешало. */
+const точкаДоступа = (exposure) =>
+  (exposure === 'internal' ? 'internal' : exposure === 'limited' ? 'limited' : 'public');
 const iocKey = (i) => `${i.type}|${i.value.toLowerCase()}`;
 
 /* --------------------------------------------------------------- ТЕМА --
@@ -364,13 +459,21 @@ function isToolAllowed(tool) {
 
 /* Метки стоимости в дереве и в карточках.
  * Смысл: аналитик не должен тратить клик на сервис, за которым его ждёт
- * форма оплаты или форма регистрации, о которых он не знал. */
+ * форма оплаты или форма регистрации, о которых он не знал.
+ *
+ * Возвращает МАССИВ УЗЛОВ, а не строку разметки: вызывающие стороны
+ * вставляли результат через insertAdjacentHTML и конкатенацию в
+ * innerHTML — оба места значились в отчёте AMO. */
 function pricingTags(tool, compact = false) {
-  if (tool.pricing === 'paid') return T('<span class="tool-tag tag-paid">платно</span>');
+  if (tool.pricing === 'paid') {
+    return [эл('span', { класс: 'tool-tag tag-paid', текст: T('платно') })];
+  }
   // В карточке индикатора список сервисов плотный: там показываем только
   // платные, иначе метки забивают выдачу. В дереве места хватает.
-  if (!compact && tool.pricing === 'free-account') return T('<span class="tool-tag">рег.</span>');
-  return '';
+  if (!compact && tool.pricing === 'free-account') {
+    return [эл('span', { класс: 'tool-tag', текст: T('рег.') })];
+  }
+  return [];
 }
 
 function toolsForType(type) {
@@ -390,18 +493,11 @@ function toolsForType(type) {
  * Поэтому выбор остаётся, а наружу такие значения не уходят.
  * ======================================================================= */
 
-/* Экранирование для тех мест, где разметка собирается строкой.
- *
- * Метка диапазона приходит из политики SOC — источник доверенный,
- * но доверенный источник с опечаткой `<` ломает разметку так же,
- * как недоверенный, и разбираться в этом потом некому. */
-function escapeHtml(s) {
-  return String(s == null ? '' : s)
-    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-}
-function escapeAttr(s) {
-  return escapeHtml(s).replace(/"/g, '&quot;').replace(/'/g, '&#39;');
-}
+/* escapeHtml/escapeAttr удалены в 0.60.0 вместе с последним местом,
+ * где разметка собиралась строкой. Оставлять их «на всякий случай»
+ * нельзя: наличие экранирующей функции — это приглашение собрать
+ * строку разметки ещё раз, а проверка в lib/dom.test.js такую правку
+ * завернёт. Нужен узел — TIDom.эл. */
 
 /** Пометить список индикаторов своими диапазонами. */
 function пометитьСвои(список) {
@@ -490,8 +586,11 @@ function renderTree(filterText = '') {
     const head = document.createElement('button');
     head.className = 'cat-head';
     head.type = 'button';
-    head.innerHTML = `<span class="cat-caret">▶</span><span>${T(cat.label)}</span>` +
-                     `<span class="cat-count">${tools.length}</span>`;
+    head.append(
+      эл('span', { класс: 'cat-caret', текст: '▶' }),
+      эл('span', { текст: T(cat.label) }),
+      эл('span', { класс: 'cat-count', текст: tools.length }),
+    );
     head.addEventListener('click', () => wrap.classList.toggle('is-open'));
 
     const body = document.createElement('div');
@@ -506,10 +605,11 @@ function renderTree(filterText = '') {
                           paid: T('без платного тарифа бесполезен') }[t.pricing] || '';
       btn.title = `${T(t.note || '')}\n[${t.exposure}/${t.activity}] ${priceNote}` +
                   (allowed ? '' : T('\n\nСкрыт фильтром'));
-      btn.innerHTML =
-        `<i class="dot dot-${t.exposure === 'internal' ? 'internal' : t.exposure === 'limited' ? 'limited' : 'public'}"></i>` +
-        `<span class="tool-name">${T(t.name)}</span>` +
-        pricingTags(t);
+      btn.append(
+        эл('i', { класс: `dot dot-${точкаДоступа(t.exposure)}` }),
+        эл('span', { класс: 'tool-name', текст: T(t.name) }),
+        ...pricingTags(t),
+      );
       if (allowed) {
         btn.addEventListener('click', () => {
           // Клик без IOC — открываем «голый» инструмент: подставляем пустую строку.
@@ -2708,7 +2808,7 @@ function renderResults() {
      * «Ещё ничего не разбирали» — отсутствие действия.
      * Раньше и то и другое выглядело одинаково пустым полем. */
     if (state.parsed) {
-      box.innerHTML = T('<p class="empty">Индикаторы не найдены.</p>');
+      box.append(эл('p', { класс: 'empty', текст: T('Индикаторы не найдены.') }));
     } else {
       renderIdleFox(box);
       return;
@@ -2729,7 +2829,10 @@ function renderResults() {
     const было = clean.length;
     clean = clean.filter((i) => !inActiveCase(i));
     if (было && !clean.length) {
-      box.innerHTML = T('<p class="empty">Новых индикаторов нет — всё уже в кейсе.</p>');
+      box.append(эл('p', {
+        класс: 'empty',
+        текст: T('Новых индикаторов нет — всё уже в кейсе.'),
+      }));
       $('#bulk-bar').hidden = true;
       renderNovelty();
       return;
@@ -2772,19 +2875,29 @@ function renderResults() {
       chk.checked ? state.selected.add(key) : state.selected.delete(key);
     });
 
+    /* Метки — УЗЛЫ, а не строки разметки.
+     *
+     * Здесь стояло escapeHtml/escapeAttr на двух значениях из четырёх,
+     * и ровно это место линтер AMO называл `Unsafe assignment`. Флаг
+     * разбора `f` приходит из ioc.js по содержимому чужой страницы
+     * и не экранировался вовсе. */
     const badges = [];
     if (already) {
       const v = VERDICTS[already.verdict] ? VERDICTS[already.verdict].label : T('не проверен');
-      badges.push(T`<span class="in-case-mark">уже в кейсе: ${v}</span>`);
+      badges.push(эл('span', { класс: 'in-case-mark', текст: T`уже в кейсе: ${v}` }));
     }
-    if (ioc.count > 1)  badges.push(`<span class="badge badge-count">×${ioc.count}</span>`);
-    if (ioc.defanged)   badges.push('<span class="badge badge-defang">defanged</span>');
+    if (ioc.count > 1) {
+      badges.push(эл('span', { класс: 'badge badge-count', текст: `×${ioc.count}` }));
+    }
+    if (ioc.defanged) {
+      badges.push(эл('span', { класс: 'badge badge-defang', текст: 'defanged' }));
+    }
     for (const f of ioc.flags || []) {
       /* Флаг «свой:…» рисуется отдельной меткой ниже — здесь он
        * пропускается, чтобы не дублировать одно и то же дважды. */
       if (String(f).startsWith(T('свой:'))) continue;
       const warn = f.startsWith('non-routable') || f.startsWith('ambiguous');
-      badges.push(`<span class="badge ${warn ? 'badge-warn' : ''}">${f}</span>`);
+      badges.push(эл('span', { класс: warn ? 'badge badge-warn' : 'badge', текст: f }));
     }
     /* Свой или клиентский адрес. Метка идёт ПЕРВОЙ и своим цветом:
      * это единственное, что отличает внешний шлюз заказчика от адреса
@@ -2797,8 +2910,11 @@ function renderResults() {
     const чьё = чейАдрес(ioc);
     if (чьё && чьё.вид === 'политика') {
       const подпись = TIOwnRanges.подпись(чьё);
-      badges.unshift(`<span class="badge badge-own" title="${escapeAttr(чьё.почему)}">`
-        + T`наш: ${escapeHtml(подпись)}</span>`);
+      badges.unshift(эл('span', {
+        класс: 'badge badge-own',
+        титул: чьё.почему,
+        текст: T`наш: ${подпись}`,
+      }));
     }
 
     /* Вердикт, выставленный ДО кейса, виден в свёрнутой строке.
@@ -2809,15 +2925,15 @@ function renderResults() {
      * превращается в работу, результата которой не видно. */
     if (ioc.verdict && ioc.verdict !== 'unknown') {
       const v = VERDICTS[ioc.verdict];
-      if (v) badges.unshift(`<span class="badge pre-verdict ${v.cls}">${v.label}</span>`);
+      if (v) badges.unshift(эл('span', { класс: `badge pre-verdict ${v.cls}`, текст: v.label }));
     }
 
-    head.append(chk);
-    head.insertAdjacentHTML('beforeend',
-      `<span class="ioc-type">${ioc.type}</span>` +
-      `<span class="ioc-value"></span>` +
-      `<span class="ioc-badges">${badges.join('')}</span>`);
-    head.querySelector('.ioc-value').textContent = ioc.value;   // textContent = защита от XSS
+    head.append(
+      chk,
+      эл('span', { класс: 'ioc-type', текст: ioc.type }),
+      эл('span', { класс: 'ioc-value', текст: ioc.value }),
+      эл('span', { класс: 'ioc-badges' }, badges),
+    );
 
     /* Кнопка копирования — ОДНА, и это решение, а не экономия.
      *
@@ -3042,7 +3158,10 @@ function renderResults() {
     chips.className = 'tool-chips';
 
     if (!tools.length) {
-      chips.innerHTML = T('<span class="no-tools">Нет инструментов для этого типа в текущем режиме данных.</span>');
+      chips.append(эл('span', {
+        класс: 'no-tools',
+        текст: T('Нет инструментов для этого типа в текущем режиме данных.'),
+      }));
     } else {
       // Внутренние источники всегда первыми: проверка «а не отработано ли уже».
       const order = { internal: 0, limited: 1, public: 2 };
@@ -3077,9 +3196,14 @@ function renderResults() {
             e.preventDefault();
           });
         }
-        a.innerHTML = `<i class="dot dot-${t.exposure === 'internal' ? 'internal' : t.exposure === 'limited' ? 'limited' : 'public'}"></i>`;
-        a.append(document.createTextNode(t.name));
-        a.insertAdjacentHTML('beforeend', pricingTags(t, true));
+        /* Имя сервиса переводится: в реестре оно по-русски
+         * («Пасты (через Google)»), и без T() оно оставалось
+         * русским в раскрытой карточке — в дереве слева при этом
+         * было переведено, что выглядит как наполовину переведённый
+         * интерфейс. */
+        a.append(эл('i', { класс: `dot dot-${точкаДоступа(t.exposure)}` }),
+                 document.createTextNode(T(t.name)),
+                 ...pricingTags(t, true));
         chips.append(a);
       }
     }
@@ -3094,7 +3218,11 @@ function renderResults() {
       row.className = 'ioc-playbook';
       const b = document.createElement('button');
       b.className = 'btn btn-mini';
-      b.textContent = pbs.length === 1 ? T`Плейбук: ${pbs[0].name}` : T('Плейбук…');
+      /* Имя плейбука переводится ОТДЕЛЬНО, вторым T().
+       * Подстановка в шаблон вставляет значение как есть: ключ
+       * `Плейбук: {0}` переводится, а имя внутри оставалось русским,
+       * и это было видно на скриншоте для магазина. */
+      b.textContent = pbs.length === 1 ? T`Плейбук: ${T(pbs[0].name)}` : T('Плейбук…');
       b.addEventListener('click', (e) => {
         e.stopPropagation();
         if (pbs.length === 1) runPlaybook(pbs[0].id, ioc.value, ioc.type);
@@ -3224,7 +3352,12 @@ function showOpenMenu() {
     .filter((t) => isToolAllowed(t) && t.types.some((ty) => selTypes.has(ty)));
 
   menu.textContent = '';
-  if (!applicable.length) { menu.innerHTML = T('<button disabled>Нет подходящих инструментов</button>'); }
+  if (!applicable.length) {
+    menu.append(эл('button', {
+      текст: T('Нет подходящих инструментов'),
+      атр: { disabled: true },
+    }));
+  }
   for (const t of applicable) {
     const n = state.iocs.filter((i) => state.selected.has(iocKey(i)) && t.types.includes(i.type)).length;
     const b = document.createElement('button');
@@ -4637,8 +4770,12 @@ function renderGraph() {
 
   const legend = document.createElement('p');
   legend.className = 'graph-legend';
-  legend.innerHTML = T('<span class="ge-key ge-key-src"></span> из источника')
-                   + T(' <span class="ge-key ge-key-part"></span> часть целого');
+  legend.append(
+    эл('span', { класс: 'ge-key ge-key-src' }),
+    ` ${T('из источника')} `,
+    эл('span', { класс: 'ge-key ge-key-part' }),
+    ` ${T('часть целого')}`,
+  );
   body.append(legend);
 
   if (обрезано) {
@@ -5116,7 +5253,7 @@ function planQuery() {
   const direct = !searxBase();
   return TIQuery.buildQuery({
     query: raw,
-    domains: profile ? profile.domains : [],
+    domains: площадкиПрофиля(profile),
     scoped,
     // Через SearXNG площадки не усекаем: предел длины запроса —
     // ограничение публичных поисковиков, а не своего инстанса.
@@ -5136,8 +5273,9 @@ function renderProfiles() {
     box.append(b);
   }
   const p = SEARCH_PROFILES.find((x) => x.id === state.profile);
-  $('#domain-list').textContent = p.domains.join('  ·  ');
-  $('#domain-count').textContent = T`— ${p.domains.length} шт.`;
+  const площадки = площадкиПрофиля(p);
+  $('#domain-list').textContent = площадки.join('  ·  ');
+  $('#domain-count').textContent = T`— ${площадки.length} шт.`;
 }
 
 /* Запрос в SearXNG. Формат: /search?q=...&time_range=...&language=...
@@ -5158,7 +5296,7 @@ async function doGlobalSearch(direct = false) {
    * разошлась — отсюда и взялись дефекты с пустой выдачей. */
   const plan = TIQuery.buildQuery({
     query: raw,
-    domains: profile ? profile.domains : [],
+    domains: площадкиПрофиля(profile),
     scoped: TIQuery.dorkSetsScope(raw),
     limit: useSearx ? 0 : TIQuery.MAX_DIRECT_SITES,
   });
@@ -5377,10 +5515,29 @@ function синхронизироватьНастройки() {
     кн.classList.toggle('is-active', кн.dataset.preset === наст.пресет);
   }
   const вкл = S.НАСТРАИВАЕМЫЕ.filter((id) => S.включено(наст, id)).length;
-  $('#preset-now').innerHTML = наст.пресет === S.СВОЙ
-    ? T`Набор собран вручную: включено <b>${вкл}</b> из ${S.НАСТРАИВАЕМЫЕ.length} функций.`
-    : T`Набор: <b>${(S.пресет(наст.пресет) || {}).имя || наст.пресет}</b> — `
-      + T`включено <b>${вкл}</b> из ${S.НАСТРАИВАЕМЫЕ.length} функций.`;
+  /* Строка собирается из кусков, потому что внутри неё есть <b>,
+   * а разметку в эту страницу мы больше не вставляем строкой.
+   * Цена — перевод кусками, то есть порядок слов задан русским
+   * оригиналом; для пары ru/en он совпадает. Если когда-нибудь
+   * добавится язык с другим порядком, эти четыре ключа придётся
+   * объединить обратно в один и размечать позицию числа. */
+  const всего = S.НАСТРАИВАЕМЫЕ.length;
+  const узелНабора = $('#preset-now');
+  if (наст.пресет === S.СВОЙ) {
+    TIDom.наполнить(узелНабора, [
+      T('Набор собран вручную: включено '),
+      эл('b', { текст: вкл }),
+      T` из ${всего} функций.`,
+    ]);
+  } else {
+    TIDom.наполнить(узелНабора, [
+      T('Набор: '),
+      эл('b', { текст: (S.пресет(наст.пресет) || {}).имя || наст.пресет }),
+      T(' — включено '),
+      эл('b', { текст: вкл }),
+      T` из ${всего} функций.`,
+    ]);
+  }
 
   for (const бокс of $$('#settings-cats [data-feature]')) {
     const ф = S.функция(бокс.dataset.feature);

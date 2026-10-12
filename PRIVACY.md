@@ -1,6 +1,6 @@
 # TI Console — Privacy Policy
 
-Updated: October 2026 · Extension version: 0.62.1
+Updated: October 2026 · Extension version: 0.63.0
 
 ## In short
 

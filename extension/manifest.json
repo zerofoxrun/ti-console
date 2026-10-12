@@ -3,7 +3,7 @@
   "default_locale": "en",
   "name": "__MSG_extName__",
   "short_name": "TI",
-  "version": "0.59.0",
+  "version": "0.61.0",
   "description": "__MSG_extDesc__",
   "browser_specific_settings": {
     "gecko": {
@@ -14,6 +14,9 @@
           "none"
         ]
       }
+    },
+    "gecko_android": {
+      "strict_min_version": "142.0"
     }
   },
   "permissions": [

@@ -63,10 +63,98 @@ const AGGREGATOR_HOSTS = [
   'attack.mitre.org', 'nvd.nist.gov', 'cve.org', 'cve.mitre.org',
 ];
 
+/* =============================================================================
+ * СЧЁТЧИКИ, ТРЕКЕРЫ И ВИДЖЕТЫ СТРАНИЦЫ
+ * =============================================================================
+ *
+ * ПОВОД. Разбор страницы блога BI.ZONE дал в выдаче вот это:
+ *
+ *   https://cllctr.roistat.com/stream/view/-/Y291bnRlcl9pZD04MzQw...
+ *
+ * Семьсот символов адреса веб-аналитики Roistat: внутри base64 лежат
+ * идентификатор счётчика, адрес читаемой страницы и куки посетителя.
+ * Индикатором это не является ничем, кроме того, что синтаксически
+ * это валидный URL. Правила выше его не ловят: хост чужой источнику,
+ * не площадка и не агрегатор. Такие адреса даёт почти каждая страница,
+ * и в выдаче они стоят рядом с настоящими находками.
+ *
+ * ЧТО СЮДА ПОПАДАЕТ. Хост, единственное назначение которого —
+ * измерять посетителя или обслуживать обвязку страницы: счётчики,
+ * трекеры, рекламные сети, капчи, баннеры согласия, виджеты чата
+ * и приёма звонков. Проверяется домен и любой его поддомен, поэтому
+ * в списке стоит `roistat.com`, а не `cllctr.roistat.com`.
+ *
+ * ЧЕГО СЮДА НЕ ПОПАДАЕТ, И ЭТО ВАЖНЕЕ СПИСКА. Хост, на котором бывает
+ * нагрузка или фишинг, не попадает сюда никогда, даже если он же
+ * раздаёт скрипты: github.io, pages.dev, workers.dev, firebaseapp.com,
+ * blogspot.com, s3.amazonaws.com, jsdelivr, unpkg, сокращатели ссылок.
+ * То же правило, что у PLATFORM_HOSTS выше: прятать настоящий
+ * индикатор хуже, чем показать лишний.
+ *
+ * И ОТДЕЛЬНО — ЧЕСТНО. Счётчик тоже бывает индикатором. Google
+ * Analytics Measurement Protocol используют для вывода данных,
+ * googletagmanager — как звено в цепочке загрузки. Поэтому значение
+ * не удаляется: оно уходит в группу «отсеяно как обвязка» с причиной,
+ * видно в счётчике и возвращается одним щелчком — ровно как
+ * колонтитул или ссылка на соцсеть.
+ * ========================================================================== */
+const TELEMETRY_HOSTS = [
+  // --- веб-аналитика и счётчики ---
+  'roistat.com', 'google-analytics.com', 'googletagmanager.com',
+  'analytics.google.com', 'mc.yandex.ru', 'mc.yandex.com',
+  'metrika.yandex.ru', 'metrica.yandex.com', 'top-fwz1.mail.ru',
+  'top.mail.ru', 'tns-counter.ru', 'counter.yadro.ru', 'liveinternet.ru',
+  'matomo.cloud', 'piwik.pro', 'plausible.io', 'simpleanalytics.com',
+  'usefathom.com', 'statcounter.com', 'getclicky.com', 'woopra.com',
+  'mixpanel.com', 'amplitude.com', 'segment.com', 'segment.io',
+  'heap.io', 'heapanalytics.com', 'posthog.com', 'kissmetrics.io',
+  'quantserve.com', 'quantcount.com', 'scorecardresearch.com',
+  'chartbeat.com', 'chartbeat.net', 'parsely.com', 'clarity.ms',
+  'hotjar.com', 'hotjar.io', 'fullstory.com', 'logrocket.com',
+  'logrocket.io', 'smartlook.com', 'smartlook.cloud', 'crazyegg.com',
+  'mouseflow.com', 'yandex-metrica.com',
+
+  // --- мониторинг производительности и ошибок (браузерные маяки) ---
+  'nr-data.net', 'newrelic.com', 'cloudflareinsights.com',
+  'browser-intake-datadoghq.com', 'browser-intake-datadoghq.eu',
+  'sentry.io', 'bugsnag.com', 'vercel-insights.com', 'vercel-scripts.com',
+
+  // --- A/B и персонализация ---
+  'optimizely.com', 'visualwebsiteoptimizer.com', 'abtasty.com',
+  'adobedtm.com', 'demdex.net', 'omtrdc.net', '2o7.net',
+  'everesttech.net',
+
+  // --- рекламные сети и пиксели ---
+  'doubleclick.net', 'googlesyndication.com', 'googleadservices.com',
+  'adservice.google.com', 'bat.bing.com', 'connect.facebook.net',
+  'analytics.tiktok.com', 'ads-twitter.com', 'analytics.twitter.com',
+  'px.ads.linkedin.com', 'criteo.com', 'criteo.net', 'adnxs.com',
+  'rubiconproject.com', 'pubmatic.com', 'openx.net', 'taboola.com',
+  'outbrain.com', 'an.yandex.ru', 'awaps.yandex.ru', 'adfox.ru',
+  'ads.adfox.ru', 'ad.mail.ru', 'ads.mail.ru', 'smi2.ru', 'smi2.net',
+  'adriver.ru', 'rutarget.ru', 'sape.ru',
+
+  // --- капчи и защита от ботов ---
+  'smartcaptcha.cloud.yandex.ru', 'captcha-api.yandex.ru',
+  'recaptcha.net', 'hcaptcha.com', 'challenges.cloudflare.com',
+  'funcaptcha.com', 'arkoselabs.com',
+
+  // --- баннеры согласия на куки ---
+  'cookiebot.com', 'cookielaw.org', 'onetrust.com', 'usercentrics.eu',
+  'iubenda.com', 'termly.io',
+
+  // --- виджеты чата, обратного звонка и поддержки ---
+  'jivosite.com', 'jivo.chat', 'carrotquest.io', 'intercom.io',
+  'intercomcdn.com', 'livechatinc.com', 'tawk.to', 'zdassets.com',
+  'calltouch.ru', 'uiscom.ru', 'comagic.ru', 'callibri.ru',
+  'bitrix24.ru', 'bitrix24.com', 'verbox.ru', 'envybox.io',
+];
+
 const REASON = {
   SOURCE: T('сайт источника'),
   PLATFORM: T('площадка присутствия'),
   AGGREGATOR: T('ссылка на карточку сервиса'),
+  TELEMETRY: T('счётчик, трекер или виджет страницы'),
   FURNITURE: T('колонтитул — повторяется по всему документу'),
   REFS: T('раздел ссылок и дополнительных материалов'),
   CONTACT: T('контактная строка в конце отчёта'),
@@ -293,6 +381,53 @@ function under(host, base) {
 }
 
 /**
+ * Хост принадлежит счётчику, трекеру или обвязочному виджету.
+ *
+ * Сравнение идёт по ДОМЕНУ и его поддоменам, а не по подстроке.
+ * Подстрока дала бы ложные срабатывания ровно того вида, который
+ * в этом продукте недопустим: `roistat.com.attacker.tld` и
+ * `fake-roistat.com` — чужие хосты, и они обязаны остаться
+ * в выдаче.
+ *
+ * @param {string} host
+ * @returns {boolean}
+ */
+function isTelemetryHost(host) {
+  const h = String(host || '').trim().toLowerCase().replace(/\.$/, '');
+  if (!h) return false;
+  return TELEMETRY_HOSTS.some((base) => under(h, base));
+}
+
+/**
+ * Адрес принадлежит счётчику, трекеру или обвязочному виджету.
+ *
+ * Отвечает на вопрос «является ли этот URL аналитическим», то есть
+ * работает со строкой адреса, а не с разобранным индикатором.
+ * Дефанг снимается: в отчёте тот же адрес стоит как hxxps://
+ * или с [.], и без снятия проверка молча не сработала бы.
+ *
+ * @param {string} url
+ * @returns {boolean}
+ */
+function isTelemetryUrl(url) {
+  const s = String(url || '').trim();
+  if (!s) return false;
+  const чистый = s
+    .replace(/^h(xx|__)p/i, 'http')
+    .replace(/\[\.\]|\(\.\)|\{\.\}/g, '.')
+    .replace(/\[:\]/g, ':')
+    .replace(/\s*\[?(?:точка|dot)\]?\s*/gi, '.');
+  let host = '';
+  try {
+    host = new URL(/^[a-z][a-z0-9+.-]*:\/\//i.test(чистый) ? чистый : 'http://' + чистый)
+      .hostname;
+  } catch (_) {
+    return false;
+  }
+  return isTelemetryHost(host);
+}
+
+/**
  * Помечает индикатор как обвязку страницы, если это так.
  *
  * @param {{type: string, value: string}} ioc
@@ -320,6 +455,14 @@ function classify(ioc, ctx = {}) {
   for (const a of AGGREGATOR_HOSTS) {
     if (under(host, a)) return { noise: true, reason: REASON.AGGREGATOR };
   }
+  /* Счётчик, трекер, баннер согласия, виджет чата. Проверяется
+   * последним из правил по хосту: все предыдущие называют причину
+   * точнее, а «сайт источника» вдобавок важнее — если счётчик стоит
+   * на домене самого вендора, аналитику полезнее знать, что это
+   * вендор, чем что это счётчик. */
+  if (isTelemetryHost(host)) {
+    return { noise: true, reason: REASON.TELEMETRY };
+  }
   return { noise: false, reason: '' };
 }
 
@@ -343,8 +486,9 @@ function sourceHostOf(url) {
 
 const NOISE_API = {
   classify, markNoise, sourceHostOf, hostOfValue, under,
+  isTelemetryHost, isTelemetryUrl,
   documentParts, chromeTextOf, markDocumentNoise,
-  PLATFORM_HOSTS, AGGREGATOR_HOSTS, REASON, REFS_HEADINGS,
+  PLATFORM_HOSTS, AGGREGATOR_HOSTS, TELEMETRY_HOSTS, REASON, REFS_HEADINGS,
   FURNITURE_MIN_REPEATS, FURNITURE_MIN_SPREAD, FURNITURE_MAX_KINDS, REFS_MIN_POSITION,
 };
 if (typeof module !== 'undefined' && module.exports) module.exports = NOISE_API;

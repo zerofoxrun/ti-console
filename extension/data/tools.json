@@ -287,7 +287,7 @@
         "asn",
         "cidr"
       ],
-      "url": "https://stat.ripe.net/app/launchpad/S1_{{ioc}}",
+      "url": "https://stat.ripe.net/resource/{{ioc_raw}}#tab=overview",
       "exposure": "public",
       "activity": "passive",
       "auth": false,

@@ -3,6 +3,19 @@
 Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 Versions are [semantic](https://semver.org/).
 
+## [0.62.1] — 2026-10-12
+
+### Fixed
+- RIPEstat opened a dead address. The entry pointed at the old Launchpad
+  app (`/app/launchpad/S1_<value>`), which that site no longer serves:
+  clicking the tool produced an error page, and from the analyst's side
+  it looked like "RIPE has nothing on this address". The entry now points
+  at `/resource/<value>#tab=overview`.
+- The same entry now uses `{{ioc_raw}}` instead of `{{ioc}}`. RIPEstat
+  accepts prefixes as well as addresses, and percent-encoding turned
+  `1.1.1.0/24` into `1.1.1.0%2F24`, which the resource page does not
+  resolve. Verified against both `1.1.1.1` and `1.1.1.0/24`.
+
 ## [0.62.0] — 2026-10-12
 
 Fourteen more services in the registry, and one translation that would

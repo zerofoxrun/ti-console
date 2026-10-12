@@ -117,37 +117,6 @@
       "api": "free-personal"
     },
     {
-      "id": "censys",
-      "name": "Censys",
-      "category": "network",
-      "types": [
-        "ipv4",
-        "ipv6"
-      ],
-      "url": "https://search.censys.io/hosts/{{ioc}}",
-      "exposure": "limited",
-      "activity": "passive",
-      "auth": true,
-      "note": "Сертификаты и JARM — хорошо ловит C2-инфраструктуру по отпечатку",
-      "pricing": "free-account",
-      "api": "paid"
-    },
-    {
-      "id": "greynoise",
-      "name": "GreyNoise",
-      "category": "network",
-      "types": [
-        "ipv4"
-      ],
-      "url": "https://viz.greynoise.io/ip/{{ioc}}",
-      "exposure": "public",
-      "activity": "passive",
-      "auth": false,
-      "note": "Отсев интернет-шума: массовые сканеры vs таргетированная активность",
-      "pricing": "free-account",
-      "api": "free-personal"
-    },
-    {
       "id": "bgp-he",
       "name": "Hurricane BGP",
       "category": "network",
@@ -165,6 +134,83 @@
       "api": "none"
     },
     {
+      "id": "blocklist-de",
+      "name": "blocklist.de",
+      "category": "network",
+      "types": [
+        "ipv4"
+      ],
+      "url": "https://www.blocklist.de/en/search.html?ip={{ioc}}",
+      "exposure": "public",
+      "activity": "passive",
+      "auth": false,
+      "note": "Жалобы от fail2ban-сенсоров: брутфорс SSH, почты, веб-форм",
+      "pricing": "free",
+      "api": "free-personal"
+    },
+    {
+      "id": "censys",
+      "name": "Censys",
+      "category": "network",
+      "types": [
+        "ipv4",
+        "ipv6"
+      ],
+      "url": "https://search.censys.io/hosts/{{ioc}}",
+      "exposure": "limited",
+      "activity": "passive",
+      "auth": true,
+      "note": "Сертификаты и JARM — хорошо ловит C2-инфраструктуру по отпечатку",
+      "pricing": "free-account",
+      "api": "paid"
+    },
+    {
+      "id": "exonerator",
+      "name": "Tor ExoneraTor",
+      "category": "network",
+      "types": [
+        "ipv4",
+        "ipv6"
+      ],
+      "url": "https://metrics.torproject.org/exonerator.html?ip={{ioc}}",
+      "exposure": "public",
+      "activity": "passive",
+      "auth": false,
+      "note": "Был ли адрес узлом Tor на заданную дату. Официальные данные Tor Project",
+      "pricing": "free",
+      "api": "none"
+    },
+    {
+      "id": "feodotracker",
+      "name": "Feodo Tracker",
+      "category": "network",
+      "types": [
+        "ipv4"
+      ],
+      "url": "https://feodotracker.abuse.ch/browse.php?search={{ioc}}",
+      "exposure": "limited",
+      "activity": "passive",
+      "auth": false,
+      "note": "C2 банковских троянов: Dridex, Emotet, QakBot, TrickBot",
+      "pricing": "free",
+      "api": "free-commercial"
+    },
+    {
+      "id": "greynoise",
+      "name": "GreyNoise",
+      "category": "network",
+      "types": [
+        "ipv4"
+      ],
+      "url": "https://viz.greynoise.io/ip/{{ioc}}",
+      "exposure": "public",
+      "activity": "passive",
+      "auth": false,
+      "note": "Отсев интернет-шума: массовые сканеры vs таргетированная активность",
+      "pricing": "free-account",
+      "api": "free-personal"
+    },
+    {
       "id": "ipinfo",
       "name": "IPinfo",
       "category": "network",
@@ -179,6 +225,22 @@
       "note": "Гео, ASN, тип сети (hosting/ISP/business) — базовая атрибуция",
       "pricing": "free-account",
       "api": "free-commercial"
+    },
+    {
+      "id": "isc-sans",
+      "name": "SANS ISC",
+      "category": "network",
+      "types": [
+        "ipv4",
+        "ipv6"
+      ],
+      "url": "https://isc.sans.edu/ipinfo.html?ip={{ioc}}",
+      "exposure": "public",
+      "activity": "passive",
+      "auth": false,
+      "note": "Отчёты honeypot-сети: что этот адрес сканировал и когда",
+      "pricing": "free",
+      "api": "free-personal"
     },
     {
       "id": "netlas",
@@ -251,6 +313,23 @@
       "api": "free-commercial"
     },
     {
+      "id": "spamhaus",
+      "name": "Spamhaus Check",
+      "category": "network",
+      "types": [
+        "ipv4",
+        "ipv6",
+        "domain"
+      ],
+      "url": "https://check.spamhaus.org/results/?query={{ioc}}",
+      "exposure": "public",
+      "activity": "passive",
+      "auth": false,
+      "note": "SBL/XBL/PBL и DBL: в каком списке и почему",
+      "pricing": "free",
+      "api": "paid"
+    },
+    {
       "id": "spur",
       "name": "Spur",
       "category": "network",
@@ -264,6 +343,23 @@
       "note": "Определение VPN/proxy/резидентных прокси",
       "pricing": "paid",
       "api": "paid"
+    },
+    {
+      "id": "talos",
+      "name": "Cisco Talos Reputation",
+      "category": "network",
+      "types": [
+        "ipv4",
+        "ipv6",
+        "domain"
+      ],
+      "url": "https://talosintelligence.com/reputation_center/lookup?search={{ioc}}",
+      "exposure": "public",
+      "activity": "passive",
+      "auth": false,
+      "note": "Репутация и объём почты; полезен как второе мнение к VT",
+      "pricing": "free",
+      "api": "none"
     },
     {
       "id": "threatfox-ip",
@@ -316,6 +412,37 @@
       "api": "free-personal"
     },
     {
+      "id": "archive-today",
+      "name": "archive.today",
+      "category": "domain",
+      "types": [
+        "domain",
+        "url"
+      ],
+      "url": "https://archive.ph/newest/{{ioc_raw}}",
+      "exposure": "public",
+      "activity": "passive",
+      "auth": false,
+      "note": "Второй архив помимо Wayback: снимает то, что Wayback пропускает",
+      "pricing": "free",
+      "api": "none"
+    },
+    {
+      "id": "builtwith",
+      "name": "BuiltWith Relationships",
+      "category": "domain",
+      "types": [
+        "domain"
+      ],
+      "url": "https://builtwith.com/relationships/{{ioc}}",
+      "exposure": "public",
+      "activity": "passive",
+      "auth": false,
+      "note": "ПИВОТ: другие сайты с тем же Google Analytics / AdSense ID или IP. Так находят остальные страницы фишингового кита. Профиль технологий — побочно",
+      "pricing": "free",
+      "api": "paid"
+    },
+    {
       "id": "certstream",
       "name": "CertStream",
       "category": "domain",
@@ -330,6 +457,22 @@
       "note": "Поток выдачи TLS-сертификатов в реальном времени — ловля свежих фишинговых доменов",
       "pricing": "free",
       "api": "none"
+    },
+    {
+      "id": "checkphish",
+      "name": "CheckPhish (Bolster)",
+      "category": "domain",
+      "types": [
+        "url",
+        "domain"
+      ],
+      "url": "https://checkphish.bolster.ai/",
+      "exposure": "public",
+      "activity": "passive",
+      "auth": false,
+      "note": "Сканер фишинга: ссылку надо отправить, она становится известна сервису",
+      "pricing": "free-account",
+      "api": "paid"
     },
     {
       "id": "crtsh",
@@ -362,6 +505,22 @@
       "api": "none"
     },
     {
+      "id": "gsb",
+      "name": "Google Safe Browsing Site Status",
+      "category": "domain",
+      "types": [
+        "domain",
+        "url"
+      ],
+      "url": "https://transparencyreport.google.com/safe-browsing/search?url={{ioc}}",
+      "exposure": "limited",
+      "activity": "passive",
+      "auth": false,
+      "note": "Статус сайта в Safe Browsing — то, что увидит пользователь Chrome",
+      "pricing": "free",
+      "api": "free-commercial"
+    },
+    {
       "id": "maltiverse",
       "name": "Maltiverse",
       "category": "domain",
@@ -379,6 +538,57 @@
       "note": "Агрегатор с классификацией и привязкой к кампаниям",
       "pricing": "free-account",
       "api": "unverified"
+    },
+    {
+      "id": "mxtoolbox",
+      "name": "MXToolbox Blacklist",
+      "category": "domain",
+      "types": [
+        "domain",
+        "ipv4"
+      ],
+      "url": "https://mxtoolbox.com/SuperTool.aspx?action=blacklist%3a{{ioc}}&run=toolpage",
+      "exposure": "public",
+      "activity": "passive",
+      "auth": false,
+      "note": "Разом по ~90 DNSBL: быстрый ответ «известен ли адрес как спамерский»",
+      "pricing": "free",
+      "api": "paid"
+    },
+    {
+      "id": "openphish",
+      "name": "OpenPhish",
+      "category": "domain",
+      "types": [
+        "url",
+        "domain",
+        "keyword"
+      ],
+      "url": "https://openphish.com/",
+      "exposure": "public",
+      "activity": "passive",
+      "auth": false,
+      "note": "Лента активного фишинга; бесплатно — только просмотр ленты, не поиск",
+      "pricing": "free",
+      "api": "paid"
+    },
+    {
+      "id": "phishstats",
+      "name": "PhishStats",
+      "category": "domain",
+      "types": [
+        "url",
+        "domain",
+        "ipv4",
+        "keyword"
+      ],
+      "url": "https://phishstats.info/",
+      "exposure": "public",
+      "activity": "passive",
+      "auth": false,
+      "note": "База фишинговых URL со score; поиск в таблице на странице",
+      "pricing": "free",
+      "api": "free-personal"
     },
     {
       "id": "phishtank",
@@ -543,28 +753,6 @@
       "api": "none"
     },
     {
-      "id": "otx",
-      "name": "AlienVault OTX",
-      "category": "file",
-      "types": [
-        "ipv4",
-        "domain",
-        "url",
-        "md5",
-        "sha1",
-        "sha256",
-        "cve",
-        "keyword"
-      ],
-      "url": "https://otx.alienvault.com/browse/global/pulses?q={{ioc}}",
-      "exposure": "public",
-      "activity": "passive",
-      "auth": true,
-      "note": "Pulse-и сообщества. Уже подключён коннектором к OpenCTI — здесь для ручной проверки контекста",
-      "pricing": "free-account",
-      "api": "free-personal"
-    },
-    {
       "id": "anyrun",
       "name": "ANY.RUN",
       "category": "file",
@@ -585,6 +773,51 @@
       "api": "free-personal"
     },
     {
+      "id": "circl-md5",
+      "name": "CIRCL hashlookup (MD5)",
+      "category": "file",
+      "types": [
+        "md5"
+      ],
+      "url": "https://hashlookup.circl.lu/lookup/md5/{{ioc}}",
+      "exposure": "limited",
+      "activity": "passive",
+      "auth": false,
+      "note": "Известные файлы NSRL и дистрибутивов: отвечает на вопрос «это штатный файл?»",
+      "pricing": "free",
+      "api": "free-commercial"
+    },
+    {
+      "id": "circl-sha1",
+      "name": "CIRCL hashlookup (SHA-1)",
+      "category": "file",
+      "types": [
+        "sha1"
+      ],
+      "url": "https://hashlookup.circl.lu/lookup/sha1/{{ioc}}",
+      "exposure": "limited",
+      "activity": "passive",
+      "auth": false,
+      "note": "Известные файлы NSRL и дистрибутивов: отвечает на вопрос «это штатный файл?»",
+      "pricing": "free",
+      "api": "free-commercial"
+    },
+    {
+      "id": "circl-sha256",
+      "name": "CIRCL hashlookup (SHA-256)",
+      "category": "file",
+      "types": [
+        "sha256"
+      ],
+      "url": "https://hashlookup.circl.lu/lookup/sha256/{{ioc}}",
+      "exposure": "limited",
+      "activity": "passive",
+      "auth": false,
+      "note": "Известные файлы NSRL и дистрибутивов: отвечает на вопрос «это штатный файл?»",
+      "pricing": "free",
+      "api": "free-commercial"
+    },
+    {
       "id": "cybercrime-tracker",
       "name": "Cybercrime Tracker",
       "category": "file",
@@ -603,19 +836,22 @@
       "api": "unverified"
     },
     {
-      "id": "triage",
-      "name": "Hatching Triage",
+      "id": "filescan",
+      "name": "Filescan.io (OPSWAT)",
       "category": "file",
       "types": [
         "md5",
         "sha1",
-        "sha256"
+        "sha256",
+        "domain",
+        "url",
+        "keyword"
       ],
-      "url": "https://tria.ge/s?q={{ioc}}",
-      "exposure": "limited",
+      "url": "https://www.filescan.io/",
+      "exposure": "public",
       "activity": "passive",
-      "auth": true,
-      "note": "Извлечённые конфиги C2 — быстрее, чем ручной разбор",
+      "auth": false,
+      "note": "Разбор файлов и ссылок, community-отчёты публичны; поиск на странице",
       "pricing": "free-account",
       "api": "free-personal"
     },
@@ -637,24 +873,21 @@
       "api": "unverified"
     },
     {
-      "id": "xfe",
-      "name": "IBM X-Force Exchange",
+      "id": "joesandbox",
+      "name": "Joe Sandbox Cloud",
       "category": "file",
       "types": [
-        "ipv4",
-        "domain",
-        "url",
         "md5",
         "sha1",
         "sha256",
-        "cve"
+        "keyword"
       ],
-      "url": "https://exchange.xforce.ibmcloud.com/search/{{ioc}}",
-      "exposure": "limited",
+      "url": "https://www.joesandbox.com/search",
+      "exposure": "public",
       "activity": "passive",
-      "auth": true,
-      "note": "Отчёты и коллекции IBM; хорошая привязка индикатора к кампании",
-      "pricing": "paid",
+      "auth": false,
+      "note": "Публичные отчёты песочницы; поиск по хешу на самой странице",
+      "pricing": "free-account",
       "api": "paid"
     },
     {
@@ -712,6 +945,45 @@
       "api": "free-personal"
     },
     {
+      "id": "otx",
+      "name": "AlienVault OTX",
+      "category": "file",
+      "types": [
+        "ipv4",
+        "domain",
+        "url",
+        "md5",
+        "sha1",
+        "sha256",
+        "cve",
+        "keyword"
+      ],
+      "url": "https://otx.alienvault.com/browse/global/pulses?q={{ioc}}",
+      "exposure": "public",
+      "activity": "passive",
+      "auth": true,
+      "note": "Pulse-и сообщества. Уже подключён коннектором к OpenCTI — здесь для ручной проверки контекста",
+      "pricing": "free-account",
+      "api": "free-personal"
+    },
+    {
+      "id": "triage",
+      "name": "Hatching Triage",
+      "category": "file",
+      "types": [
+        "md5",
+        "sha1",
+        "sha256"
+      ],
+      "url": "https://tria.ge/s?q={{ioc}}",
+      "exposure": "limited",
+      "activity": "passive",
+      "auth": true,
+      "note": "Извлечённые конфиги C2 — быстрее, чем ручной разбор",
+      "pricing": "free-account",
+      "api": "free-personal"
+    },
+    {
       "id": "viriback",
       "name": "ViriBack Tracker",
       "category": "file",
@@ -761,6 +1033,44 @@
       "note": "Архив образцов и статей",
       "pricing": "free",
       "api": "none"
+    },
+    {
+      "id": "xfe",
+      "name": "IBM X-Force Exchange",
+      "category": "file",
+      "types": [
+        "ipv4",
+        "domain",
+        "url",
+        "md5",
+        "sha1",
+        "sha256",
+        "cve"
+      ],
+      "url": "https://exchange.xforce.ibmcloud.com/search/{{ioc}}",
+      "exposure": "limited",
+      "activity": "passive",
+      "auth": true,
+      "note": "Отчёты и коллекции IBM; хорошая привязка индикатора к кампании",
+      "pricing": "paid",
+      "api": "paid"
+    },
+    {
+      "id": "yaraify",
+      "name": "YARAify",
+      "category": "file",
+      "types": [
+        "md5",
+        "sha1",
+        "sha256"
+      ],
+      "url": "https://yaraify.abuse.ch/sample/{{ioc}}/",
+      "exposure": "limited",
+      "activity": "passive",
+      "auth": false,
+      "note": "Какие YARA-правила срабатывают на образец",
+      "pricing": "free",
+      "api": "free-commercial"
     },
     {
       "id": "dehashed",
@@ -842,6 +1152,23 @@
       "api": "unverified"
     },
     {
+      "id": "bdu-fstec",
+      "name": "БДУ ФСТЭК",
+      "category": "vuln",
+      "types": [
+        "cve",
+        "bdu",
+        "keyword"
+      ],
+      "url": "https://bdu.fstec.ru/search?ipp=20&q={{ioc}}",
+      "exposure": "public",
+      "activity": "passive",
+      "auth": false,
+      "note": "Обязательно для отчётности по российским требованиям",
+      "pricing": "free",
+      "api": "none"
+    },
+    {
       "id": "cisa-kev",
       "name": "CISA KEV",
       "category": "vuln",
@@ -854,6 +1181,36 @@
       "activity": "passive",
       "auth": false,
       "note": "Подтверждённая эксплуатация in-the-wild — главный приоритизатор",
+      "pricing": "free",
+      "api": "free-commercial"
+    },
+    {
+      "id": "cvedetails",
+      "name": "CVE Details",
+      "category": "vuln",
+      "types": [
+        "cve"
+      ],
+      "url": "https://www.cvedetails.com/cve/{{ioc}}/",
+      "exposure": "public",
+      "activity": "passive",
+      "auth": false,
+      "note": "Карточка CVE: затронутые продукты, CVSS, EPSS, ссылки",
+      "pricing": "free",
+      "api": "paid"
+    },
+    {
+      "id": "epss",
+      "name": "FIRST EPSS",
+      "category": "vuln",
+      "types": [
+        "cve"
+      ],
+      "url": "https://api.first.org/data/v1/epss?cve={{ioc}}",
+      "exposure": "public",
+      "activity": "passive",
+      "auth": false,
+      "note": "Вероятность эксплуатации в ближайшие 30 дней; открывается JSON",
       "pricing": "free",
       "api": "free-commercial"
     },
@@ -920,6 +1277,21 @@
       "api": "free-commercial"
     },
     {
+      "id": "osv",
+      "name": "OSV.dev",
+      "category": "vuln",
+      "types": [
+        "cve"
+      ],
+      "url": "https://osv.dev/vulnerability/{{ioc}}",
+      "exposure": "public",
+      "activity": "passive",
+      "auth": false,
+      "note": "Уязвимости в открытом ПО, связь с пакетами и коммитами фикса",
+      "pricing": "free",
+      "api": "free-commercial"
+    },
+    {
       "id": "vulners",
       "name": "Vulners",
       "category": "vuln",
@@ -936,23 +1308,6 @@
       "api": "free-personal"
     },
     {
-      "id": "bdu-fstec",
-      "name": "БДУ ФСТЭК",
-      "category": "vuln",
-      "types": [
-        "cve",
-        "bdu",
-        "keyword"
-      ],
-      "url": "https://bdu.fstec.ru/search?ipp=20&q={{ioc}}",
-      "exposure": "public",
-      "activity": "passive",
-      "auth": false,
-      "note": "Обязательно для отчётности по российским требованиям",
-      "pricing": "free",
-      "api": "none"
-    },
-    {
       "id": "aptnotes",
       "name": "APTnotes",
       "category": "actor",
@@ -964,6 +1319,22 @@
       "activity": "passive",
       "auth": false,
       "note": "Архив публичных отчётов по APT-кампаниям",
+      "pricing": "free",
+      "api": "none"
+    },
+    {
+      "id": "attack",
+      "name": "MITRE ATT&CK",
+      "category": "actor",
+      "types": [
+        "attack",
+        "keyword"
+      ],
+      "url": "https://attack.mitre.org/search/?q={{ioc}}",
+      "exposure": "public",
+      "activity": "passive",
+      "auth": false,
+      "note": "Описание техники, детект-рекомендации, использующие группы",
       "pricing": "free",
       "api": "none"
     },
@@ -1030,22 +1401,6 @@
       "api": "none"
     },
     {
-      "id": "attack",
-      "name": "MITRE ATT&CK",
-      "category": "actor",
-      "types": [
-        "attack",
-        "keyword"
-      ],
-      "url": "https://attack.mitre.org/search/?q={{ioc}}",
-      "exposure": "public",
-      "activity": "passive",
-      "auth": false,
-      "note": "Описание техники, детект-рекомендации, использующие группы",
-      "pricing": "free",
-      "api": "none"
-    },
-    {
       "id": "orkl",
       "name": "ORKL",
       "category": "actor",
@@ -1059,6 +1414,22 @@
       "note": "Полнотекстовый поиск по корпусу публичных TI-отчётов",
       "pricing": "free",
       "api": "none"
+    },
+    {
+      "id": "ransomware-live",
+      "name": "Ransomware.live",
+      "category": "actor",
+      "types": [
+        "domain",
+        "keyword"
+      ],
+      "url": "https://ransomware.live/search?q={{ioc}}",
+      "exposure": "public",
+      "activity": "passive",
+      "auth": false,
+      "note": "Мониторинг сайтов утечек: группировки, жертвы, даты публикаций",
+      "pricing": "free",
+      "api": "free-personal"
     },
     {
       "id": "threatbook",
@@ -1077,21 +1448,6 @@
       "api": "unverified"
     },
     {
-      "id": "blockchain-btc",
-      "name": "Blockchain.com",
-      "category": "crypto",
-      "types": [
-        "btc"
-      ],
-      "url": "https://www.blockchain.com/explorer/addresses/btc/{{ioc}}",
-      "exposure": "public",
-      "activity": "passive",
-      "auth": false,
-      "note": "Транзакции, баланс, кластеризация",
-      "pricing": "free",
-      "api": "none"
-    },
-    {
       "id": "bitcoinabuse",
       "name": "Chainabuse",
       "category": "crypto",
@@ -1108,6 +1464,21 @@
       "api": "none"
     },
     {
+      "id": "blockchain-btc",
+      "name": "Blockchain.com",
+      "category": "crypto",
+      "types": [
+        "btc"
+      ],
+      "url": "https://www.blockchain.com/explorer/addresses/btc/{{ioc}}",
+      "exposure": "public",
+      "activity": "passive",
+      "auth": false,
+      "note": "Транзакции, баланс, кластеризация",
+      "pricing": "free",
+      "api": "none"
+    },
+    {
       "id": "etherscan",
       "name": "Etherscan",
       "category": "crypto",
@@ -1119,6 +1490,38 @@
       "activity": "passive",
       "auth": false,
       "note": "Транзакции ETH и токенов",
+      "pricing": "free",
+      "api": "none"
+    },
+    {
+      "id": "ransomwhere",
+      "name": "Ransomwhere",
+      "category": "crypto",
+      "types": [
+        "btc",
+        "keyword"
+      ],
+      "url": "https://ransomwhe.re/",
+      "exposure": "public",
+      "activity": "passive",
+      "auth": false,
+      "note": "Открытый трекер выкупов: BTC-адреса и суммы; поиска по адресу нет, есть выгрузка",
+      "pricing": "free",
+      "api": "free-commercial"
+    },
+    {
+      "id": "ahmia",
+      "name": "Ahmia",
+      "category": "code",
+      "types": [
+        "onion",
+        "keyword"
+      ],
+      "url": "https://ahmia.fi/search/?q={{ioc}}",
+      "exposure": "public",
+      "activity": "passive",
+      "auth": "none",
+      "note": "Поиск по onion-сервисам из обычной сети. Сам onion не открывает — показывает, что о нём известно.",
       "pricing": "free",
       "api": "none"
     },
@@ -1195,6 +1598,21 @@
       "api": "none"
     },
     {
+      "id": "capec",
+      "name": "MITRE CAPEC",
+      "category": "reference",
+      "types": [
+        "keyword"
+      ],
+      "url": "https://capec.mitre.org/data/definitions/index.html",
+      "exposure": "public",
+      "activity": "passive",
+      "auth": false,
+      "note": "Классификация шаблонов атак — дополняет ATT&CK на уровне механики",
+      "pricing": "free",
+      "api": "none"
+    },
+    {
       "id": "cti-blueprints",
       "name": "CTI Blueprints",
       "category": "reference",
@@ -1206,6 +1624,21 @@
       "activity": "passive",
       "auth": false,
       "note": "Шаблоны TI-отчётов от CTID. Взяты за основу наших скелетов отчёта",
+      "pricing": "free",
+      "api": "none"
+    },
+    {
+      "id": "ctid",
+      "name": "MITRE Engenuity CTID",
+      "category": "reference",
+      "types": [
+        "keyword"
+      ],
+      "url": "https://github.com/center-for-threat-informed-defense",
+      "exposure": "public",
+      "activity": "passive",
+      "auth": false,
+      "note": "Проекты вокруг ATT&CK: Attack Flow, Sightings, Summiting the Pyramid",
       "pricing": "free",
       "api": "none"
     },
@@ -1270,32 +1703,33 @@
       "api": "none"
     },
     {
-      "id": "capec",
-      "name": "MITRE CAPEC",
+      "id": "gtfobins",
+      "name": "GTFOBins",
       "category": "reference",
       "types": [
         "keyword"
       ],
-      "url": "https://capec.mitre.org/data/definitions/index.html",
+      "url": "https://gtfobins.github.io/",
       "exposure": "public",
       "activity": "passive",
       "auth": false,
-      "note": "Классификация шаблонов атак — дополняет ATT&CK на уровне механики",
+      "note": "То же для Unix: штатные бинарники и что с ними можно сделать. Данные в пакет не кладутся, см. data/ИСТОЧНИКИ.md",
       "pricing": "free",
       "api": "none"
     },
     {
-      "id": "ctid",
-      "name": "MITRE Engenuity CTID",
+      "id": "lolbas",
+      "name": "LOLBAS",
       "category": "reference",
       "types": [
+        "winpath",
         "keyword"
       ],
-      "url": "https://github.com/center-for-threat-informed-defense",
+      "url": "https://lolbas-project.github.io/",
       "exposure": "public",
       "activity": "passive",
       "auth": false,
-      "note": "Проекты вокруг ATT&CK: Attack Flow, Sightings, Summiting the Pyramid",
+      "note": "Штатные исполняемые файлы Windows, пригодные для атаки. Поиск по имени файла на их странице — данные в пакет не кладутся, см. data/ИСТОЧНИКИ.md",
       "pricing": "free",
       "api": "none"
     },
@@ -1330,151 +1764,6 @@
       "api": "paid"
     },
     {
-      "id": "isc-sans",
-      "name": "SANS ISC",
-      "category": "network",
-      "types": [
-        "ipv4",
-        "ipv6"
-      ],
-      "url": "https://isc.sans.edu/ipinfo.html?ip={{ioc}}",
-      "exposure": "public",
-      "activity": "passive",
-      "auth": false,
-      "note": "Отчёты honeypot-сети: что этот адрес сканировал и когда",
-      "pricing": "free",
-      "api": "free-personal"
-    },
-    {
-      "id": "talos",
-      "name": "Cisco Talos Reputation",
-      "category": "network",
-      "types": [
-        "ipv4",
-        "ipv6",
-        "domain"
-      ],
-      "url": "https://talosintelligence.com/reputation_center/lookup?search={{ioc}}",
-      "exposure": "public",
-      "activity": "passive",
-      "auth": false,
-      "note": "Репутация и объём почты; полезен как второе мнение к VT",
-      "pricing": "free",
-      "api": "none"
-    },
-    {
-      "id": "spamhaus",
-      "name": "Spamhaus Check",
-      "category": "network",
-      "types": [
-        "ipv4",
-        "ipv6",
-        "domain"
-      ],
-      "url": "https://check.spamhaus.org/results/?query={{ioc}}",
-      "exposure": "public",
-      "activity": "passive",
-      "auth": false,
-      "note": "SBL/XBL/PBL и DBL: в каком списке и почему",
-      "pricing": "free",
-      "api": "paid"
-    },
-    {
-      "id": "blocklist-de",
-      "name": "blocklist.de",
-      "category": "network",
-      "types": [
-        "ipv4"
-      ],
-      "url": "https://www.blocklist.de/en/search.html?ip={{ioc}}",
-      "exposure": "public",
-      "activity": "passive",
-      "auth": false,
-      "note": "Жалобы от fail2ban-сенсоров: брутфорс SSH, почты, веб-форм",
-      "pricing": "free",
-      "api": "free-personal"
-    },
-    {
-      "id": "exonerator",
-      "name": "Tor ExoneraTor",
-      "category": "network",
-      "types": [
-        "ipv4",
-        "ipv6"
-      ],
-      "url": "https://metrics.torproject.org/exonerator.html?ip={{ioc}}",
-      "exposure": "public",
-      "activity": "passive",
-      "auth": false,
-      "note": "Был ли адрес узлом Tor на заданную дату. Официальные данные Tor Project",
-      "pricing": "free",
-      "api": "none"
-    },
-    {
-      "id": "feodotracker",
-      "name": "Feodo Tracker",
-      "category": "network",
-      "types": [
-        "ipv4"
-      ],
-      "url": "https://feodotracker.abuse.ch/browse.php?search={{ioc}}",
-      "exposure": "limited",
-      "activity": "passive",
-      "auth": false,
-      "note": "C2 банковских троянов: Dridex, Emotet, QakBot, TrickBot",
-      "pricing": "free",
-      "api": "free-commercial"
-    },
-    {
-      "id": "yaraify",
-      "name": "YARAify",
-      "category": "file",
-      "types": [
-        "md5",
-        "sha1",
-        "sha256"
-      ],
-      "url": "https://yaraify.abuse.ch/sample/{{ioc}}/",
-      "exposure": "limited",
-      "activity": "passive",
-      "auth": false,
-      "note": "Какие YARA-правила срабатывают на образец",
-      "pricing": "free",
-      "api": "free-commercial"
-    },
-    {
-      "id": "archive-today",
-      "name": "archive.today",
-      "category": "domain",
-      "types": [
-        "domain",
-        "url"
-      ],
-      "url": "https://archive.ph/newest/{{ioc_raw}}",
-      "exposure": "public",
-      "activity": "passive",
-      "auth": false,
-      "note": "Второй архив помимо Wayback: снимает то, что Wayback пропускает",
-      "pricing": "free",
-      "api": "none"
-    },
-    {
-      "id": "mxtoolbox",
-      "name": "MXToolbox Blacklist",
-      "category": "domain",
-      "types": [
-        "domain",
-        "ipv4"
-      ],
-      "url": "https://mxtoolbox.com/SuperTool.aspx?action=blacklist%3a{{ioc}}&run=toolpage",
-      "exposure": "public",
-      "activity": "passive",
-      "auth": false,
-      "note": "Разом по ~90 DNSBL: быстрый ответ «известен ли адрес как спамерский»",
-      "pricing": "free",
-      "api": "paid"
-    },
-    {
       "id": "threatfeeds",
       "name": "threatfeeds.io",
       "category": "reference",
@@ -1486,68 +1775,6 @@
       "activity": "passive",
       "auth": false,
       "note": "Каталог бесплатных фидов с указанием лицензии — отправная точка для crawler-seeds",
-      "pricing": "free",
-      "api": "none"
-    },
-    {
-      "id": "builtwith",
-      "name": "BuiltWith Relationships",
-      "category": "domain",
-      "types": [
-        "domain"
-      ],
-      "url": "https://builtwith.com/relationships/{{ioc}}",
-      "exposure": "public",
-      "activity": "passive",
-      "auth": false,
-      "note": "ПИВОТ: другие сайты с тем же Google Analytics / AdSense ID или IP. Так находят остальные страницы фишингового кита. Профиль технологий — побочно",
-      "pricing": "free",
-      "api": "paid"
-    },
-    {
-      "id": "ahmia",
-      "name": "Ahmia",
-      "category": "code",
-      "types": [
-        "onion",
-        "keyword"
-      ],
-      "url": "https://ahmia.fi/search/?q={{ioc}}",
-      "exposure": "public",
-      "activity": "passive",
-      "auth": "none",
-      "note": "Поиск по onion-сервисам из обычной сети. Сам onion не открывает — показывает, что о нём известно.",
-      "pricing": "free",
-      "api": "none"
-    },
-    {
-      "id": "lolbas",
-      "name": "LOLBAS",
-      "category": "reference",
-      "types": [
-        "winpath",
-        "keyword"
-      ],
-      "url": "https://lolbas-project.github.io/",
-      "exposure": "public",
-      "activity": "passive",
-      "auth": false,
-      "note": "Штатные исполняемые файлы Windows, пригодные для атаки. Поиск по имени файла на их странице — данные в пакет не кладутся, см. data/ИСТОЧНИКИ.md",
-      "pricing": "free",
-      "api": "none"
-    },
-    {
-      "id": "gtfobins",
-      "name": "GTFOBins",
-      "category": "reference",
-      "types": [
-        "keyword"
-      ],
-      "url": "https://gtfobins.github.io/",
-      "exposure": "public",
-      "activity": "passive",
-      "auth": false,
-      "note": "То же для Unix: штатные бинарники и что с ними можно сделать. Данные в пакет не кладутся, см. data/ИСТОЧНИКИ.md",
       "pricing": "free",
       "api": "none"
     }

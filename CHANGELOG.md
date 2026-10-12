@@ -3,6 +3,32 @@
 Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 Versions are [semantic](https://semver.org/).
 
+## [0.62.0] — 2026-10-12
+
+Fourteen more services in the registry, and one translation that would
+have been lost on the next rebuild.
+
+### Added
+- 14 services, 89 -> 103 in 9 categories. Vulnerabilities: FIRST EPSS,
+  OSV.dev, CVE Details. Files: Joe Sandbox Cloud, Filescan.io and CIRCL
+  hashlookup (one entry per hash algorithm — the service has a separate
+  endpoint for each). Phishing: OpenPhish, PhishStats, CheckPhish, and
+  Google Safe Browsing site status. Ransomware: Ransomware.live and
+  Ransomwhere.
+- Eight of the fourteen open straight on the value; six open a section
+  of the site, because those services publish no search URL that could
+  be verified. An unverified template is worse than a missing tool: it
+  silently opens a 404 and the analyst reads that as "nothing found".
+
+### Fixed
+- `locales/en.js` is generated from `tools/i18n/ru-en.json`, but the
+  0.61.0 string "счётчик, трекер или виджет страницы" had reached the
+  generated file without passing through the master. Rebuilding the
+  dictionary — which `BUILD.md` tells a reviewer to do — dropped that
+  translation and showed the Russian reason in the English interface,
+  with no error anywhere. The pair is now in the master, and
+  `tools/locales.py` reports 0 untranslated strings.
+
 ## [0.61.0] — 2026-10-10
 
 Counters and trackers no longer appear in the indicator list.

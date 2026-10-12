@@ -54,7 +54,7 @@ windows-1251 are decoded correctly.
 allow-listed set of headers. Response bodies, cookies and authorisation
 headers never enter the parse.
 
-**Matches indicators to tools.** 89 OSINT and threat-intel services in
+**Matches indicators to tools.** 103 OSINT and threat-intel services in
 9 categories, each tagged with what it will see: `public` (submitting the
 value discloses it), `limited` (a commercial service sees the query but
 does not publish it), free / account / paid.
@@ -187,7 +187,7 @@ reproduced from the sources in this repository.
 
 ## Status
 
-Version 0.61.0. The extension is feature-complete for the workflow it
+Version 0.62.0. The extension is feature-complete for the workflow it
 describes and is in daily use. Interface localisation covers 1532 strings
 in English and Russian.
 

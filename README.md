@@ -115,7 +115,10 @@ corner. The choice is stored in `storage.local` and survives a restart.
 
 ## Install
 
-**From a store** — once published, links will be here.
+**Chrome Web Store:**
+https://chromewebstore.google.com/detail/ti-console/nelhgieipckdlblbaoogiacpfkgkdpna
+
+**Firefox Add-ons:** under review; the link will be here once it is published.
 
 **From source, Chrome / Chromium:**
 

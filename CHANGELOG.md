@@ -3,6 +3,35 @@
 Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 Versions are [semantic](https://semver.org/).
 
+## [1.0.0] — 2026-10-13
+
+### Changed
+- Version renumbered from 0.63.0 to 1.0.0. There is no code change
+  behind the jump: the number says the extension is done, not that it
+  gained a feature. From here on the version is semantic in the usual
+  sense — the export formats (CSV columns, JSON and STIX shape, the
+  Navigator layer), the browser-policy keys and the case schema in
+  `storage.local` are a contract, and breaking any of them would
+  require 2.0.0. Earlier releases keep their 0.x numbers: each is
+  published with a hash recorded against that number, and renumbering
+  history would break the only check that ties a package to its source.
+
+### Added
+- 69 more sites in the source-search profiles, 185 -> 254 across the six
+  profiles: cloud and container security (Wiz, Orca, Aqua, Sysdig, Cado),
+  e-mail and web (Barracuda, Abnormal, Cloudflare, Sucuri), incident
+  response (Kroll, Secureworks, Arctic Wolf, Binary Defense), European
+  CERTs (Poland, Latvia, Estonia, Luxembourg, Hungary, Slovakia,
+  Slovenia), law enforcement and sanctions (Europol, IC3, OFAC),
+  vulnerability databases (Rapid7, Tenable, Qualys, WPScan, CERT/CC),
+  package registries (npm, PyPI, crates.io, Docker Hub), scanners
+  (urlscan, Shodan, BinaryEdge), malware traffic and sandbox feeds, and
+  detection engineering sources.
+- Six entries that would have collapsed into a domain already in the
+  same profile were dropped before release. `site:` takes the domain and
+  discards the path, so such an entry adds nothing to the query while
+  appearing in the profile list as a separate site.
+
 ## [0.63.0] — 2026-10-12
 
 Source search is no longer Russian-first when the interface is English.

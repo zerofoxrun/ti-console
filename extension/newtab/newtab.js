@@ -180,6 +180,16 @@ const SEARCH_PROFILES = [
       'akamai.com/blog/security-research', 'blog.reversinglabs.com',
       'domaintools.com/resources/blog', 'lab52.io', 'nao-sec.org', 'censys.com/blog',
       'hunt.io/blog', 'silentpush.com/blog', 'blog.virustotal.com', 'yoroi.company/research',
+      // --- добавлено в 1.0.0 ---
+      'blog.sucuri.net', 'securityscorecard.com/research', 'blog.phylum.io',
+      'socradar.io/blog', 'cyble.com/blog', 'resecurity.com/blog',
+      'inquest.net/blog', 'blog.aquasec.com', 'sysdig.com/blog', 'wiz.io/blog',
+      'orca.security/resources/blog', 'cadosecurity.com/blog', 'darktrace.com/blog',
+      'blog.barracuda.com', 'abnormal.ai/blog', 'blog.cloudflare.com',
+      'aws.amazon.com/blogs/security', 'kroll.com/en/insights', 'secureworks.com/research',
+      'arcticwolf.com/resources/blog', 'binarydefense.com/resources',
+      'deepinstinct.com/blog', 'perception-point.io/blog', 'gdatasoftware.com/blog',
+      'cert.pl/en/posts',
     ],
     /* Русскоязычные площадки этого профиля. Нужны не для
      * фильтрации, а для порядка: см. площадкиПрофиля(). */
@@ -206,6 +216,11 @@ const SEARCH_PROFILES = [
       // --- добавлено в 0.63.0: международные площадки ---
       'govcert.ch', 'ncsc.govt.nz', 'cert.br', 'cert-in.org.in', 'krcert.or.kr',
       'csa.gov.sg', 'cert.at', 'cert.gov.il',
+      // --- добавлено в 1.0.0 ---
+      'ncsc.gov.pl', 'cert.lv', 'cert.ee', 'circl.lu', 'cert.hu', 'cert.sk',
+      'cert.si', 'nist.gov/cyberframework',
+      'europol.europa.eu', 'ic3.gov', 'justice.gov/criminal/cybercrime',
+      'treasury.gov/ofac', 'sanctionssearch.ofac.treas.gov',
     ],
     /* Русскоязычные площадки этого профиля. Нужны не для
      * фильтрации, а для порядка: см. площадкиПрофиля(). */
@@ -231,6 +246,10 @@ const SEARCH_PROFILES = [
       // --- добавлено в 0.63.0: международные площадки ---
       'cvedetails.com', 'opencve.io', 'vulmon.com', 'security-tracker.debian.org',
       'access.redhat.com/security', 'ubuntu.com/security/notices', 'security.paloaltonetworks.com',
+      // --- добавлено в 1.0.0 ---
+      'poc-in-github.motikan2010.net', 'rapid7.com/db',
+      'tenable.com/plugins', 'qualys.com/research',
+      'wpscan.com/vulnerabilities', 'kb.cert.org/vuls',
     ],
     /* Русскоязычные площадки этого профиля. Нужны не для
      * фильтрации, а для порядка: см. площадкиПрофиля(). */
@@ -251,6 +270,9 @@ const SEARCH_PROFILES = [
       'gitee.com', 'codeberg.org', 'huggingface.co', 'habr.com/ru/companies',
       // --- добавлено в 0.63.0: международные площадки ---
       'paste.ee', 'justpaste.it', 'telegra.ph', 'codepen.io',
+      // --- добавлено в 1.0.0 ---
+      'npmjs.com', 'pypi.org', 'crates.io', 'hub.docker.com', 'publicwww.com',
+      'urlscan.io/search', 'shodan.io/search', 'binaryedge.io',
     ],
     /* Русскоязычные площадки этого профиля. Нужны не для
      * фильтрации, а для порядка: см. площадкиПрофиля(). */
@@ -276,6 +298,10 @@ const SEARCH_PROFILES = [
       // --- добавлено в 0.63.0: международные площадки ---
       'theregister.com', 'helpnetsecurity.com', 'securityaffairs.com',
       'databreaches.net', 'vx-underground.org', 'lobste.rs', 'cybersecuritydive.com',
+      // --- добавлено в 1.0.0 ---
+      'infosecwriteups.com', 'ransomwatch.telemetry.ltd', 'ransomware.live',
+      'malware-traffic-analysis.net', 'any.run/malware-trends', 'tria.ge/reports/public',
+      'abuse.ch', 'youtube.com/@MalwareAnalysisForHedgehogs',
     ],
     /* Русскоязычные площадки этого профиля. Нужны не для
      * фильтрации, а для порядка: см. площадкиПрофиля(). */
@@ -301,6 +327,11 @@ const SEARCH_PROFILES = [
       // --- добавлено в 0.63.0: международные площадки ---
       'sigmahq.io', 'atomicredteam.io', 'hijacklibs.net', 'lots-project.com',
       'filesec.io', 'malapi.io', 'loldrivers.io',
+      // --- добавлено в 1.0.0 ---
+      'elastic.co/guide/en/security/current/prebuilt-rules.html',
+      'docs.splunk.com', 'learn.microsoft.com/en-us/defender-xdr', 'wazuh.com/blog',
+      'panther.com/blog', 'detectionengineering.net', 'blog.cyberalerts.io',
+      'threathunterplaybook.com', 'ossec.net',
     ],
     ru: [],
   },

@@ -16,10 +16,10 @@ python3 tools/build.py --firefox
 
 Output: `dist/ti-console.xpi`.
 
-Expected SHA-256 for version 0.63.0:
+Expected SHA-256 for version 1.0.0:
 
 ```
-d7419a727c0b5dde7790127c554c0483a3c4062a7a79f0bb016d89b62c904561
+cbd2dcd958d075bc23d8e95ab55f655da551e6b59a56e06774e222daeaa4cdfd
 ```
 
 Every zip entry carries a fixed timestamp (2026-01-01 00:00:00), which is

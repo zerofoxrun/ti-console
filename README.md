@@ -118,8 +118,7 @@ corner. The choice is stored in `storage.local` and survives a restart.
 **Chrome Web Store:**
 https://chromewebstore.google.com/detail/ti-console/nelhgieipckdlblbaoogiacpfkgkdpna
 
-**Firefox Add-ons:** under review; the link will be here once it is published.
-https://addons.mozilla.org/en-US/firefox/addon/ti-console/
+**Firefox Add-ons:** https://addons.mozilla.org/en-US/firefox/addon/ti-console/
 
 **From source, Chrome / Chromium:**
 

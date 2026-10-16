@@ -121,6 +121,7 @@ https://chromewebstore.google.com/detail/ti-console/nelhgieipckdlblbaoogiacpfkgk
 **Firefox Add-ons:** under review; the link will be here once it is published.
 
 **From source, Chrome / Chromium:**
+https://addons.mozilla.org/en-US/firefox/addon/ti-console/
 
 ```bash
 python3 tools/build.py --chrome      # produces dist/ti-console-chrome.zip

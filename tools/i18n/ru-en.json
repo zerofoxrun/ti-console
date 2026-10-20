@@ -459,7 +459,6 @@
   "Закрыть": "Close",
   "Заметка": "Note",
   "Записывается идентификатор функции, число применений и дата последнего. Ни индикаторов, ни имён файлов, ни названий кейсов: это счётчик, а не второй журнал расследования. В выгрузку настроек счётчики не попадают.": "What is recorded: the feature identifier, how many times it was used and the date of the last use. No indicators, no file names, no case names: this is a counter, not a second investigation log. Counters are not included in the settings export.",
-  "Записывается то, что меняет состояние расследования: разобранные источники, добавленные индикаторы, вердикты, плейбуки, выгрузки. Текст заметок не записывается — он уже есть в таблице выше.": "What is recorded is whatever changes the state of the investigation: parsed sources, added indicators, verdicts, playbooks, exports. Note text is not recorded — it is already in the table above.",
   "Запрос идёт напрямую к {0} ({1}), ": "The request goes directly to {0} ({1}), ",
   "Запросы, сделанные до начала записи, в файл не попали, а первый запрос страницы как раз и бывает сделан раньше. Записи без адреса сервера — это ответы из кеша и из service worker, а не сбой разбора.": "Requests made before recording started did not reach the file, and the page’s very first request is often one of them. Entries without a server address are responses from the cache and from a service worker, not a parsing failure.",
   "Здесь выбирается,": "Here you choose,",
@@ -1680,5 +1679,14 @@
   "Свои проверки сохранены версией {0}, эта понимает {1}. ": "Your checks were saved by version {0}, this one understands {1}. ",
   "Свой список сервисов: одно нажатие открывает подходящие типу": "Your own list of services: one click opens the ones that fit the type",
   "Список очищен": "The list is cleared",
-  "Уберите лишние и нажмите «Сохранить».": "Drop the extra ones and press \"Save\"."
+  "Уберите лишние и нажмите «Сохранить».": "Drop the extra ones and press \"Save\".",
+  "Ctrl+K — инструменты, проверки и действия · Ctrl+Enter — разобрать": "Ctrl+K — tools, checks and actions · Ctrl+Enter — parse",
+  "Инструмент, проверка или действие… (Esc — закрыть)": "Tool, check or action… (Esc — close)",
+  "Мои проверки…": "My checks…",
+  "Открыть мой список проверок по выбранным индикаторам": "Open my list of checks for the selected indicators",
+  "Проверки: {0}": "Checks: {0}",
+  "Список проверок не настроен": "The list of checks is not set up",
+  "Список проверок не настроен или не подходит этим типам": "The list of checks is not set up, or fits none of these types",
+  "набор": "set",
+  "Записывается то, что меняет состояние расследования: разобранные источники, добавленные индикаторы, вердикты, проверки, выгрузки. Текст заметок не записывается — он уже есть в таблице выше.": "What is recorded is whatever changes the state of the investigation: parsed sources, added indicators, verdicts, checks, exports. Note text is not recorded — it is already in the table above."
 }

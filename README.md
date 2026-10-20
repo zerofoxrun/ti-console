@@ -88,6 +88,15 @@ drafts on purpose: the browser generates the text and does not send it
 anywhere. No execution, no SIEM integration. Responsibility for deploying
 a rule stays with the SOC.
 
+![My checks](docs/screenshots/06-my-checks.png)
+
+**One list of checks, configured once.** Pick the services you actually
+use; a click in the extension window opens the ones that work with the
+indicator found — network services for an address, sandboxes for a hash,
+certificate transparency for a domain. Indicator types are not selected,
+they follow from the contents. The number of tabs is printed on the
+button before you press it.
+
 ---
 
 ## Client-data mode

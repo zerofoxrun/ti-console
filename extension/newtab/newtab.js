@@ -3258,7 +3258,7 @@ function renderResults() {
        * Подстановка в шаблон вставляет значение как есть: ключ
        * `Плейбук: {0}` переводится, а имя внутри оставалось русским,
        * и это было видно на скриншоте для магазина. */
-      b.textContent = pbs.length === 1 ? T`Плейбук: ${T(pbs[0].name)}` : T('Плейбук…');
+      b.textContent = pbs.length === 1 ? T`Проверки: ${T(pbs[0].name)}` : T('Мои проверки…');
       b.addEventListener('click', (e) => {
         e.stopPropagation();
         if (pbs.length === 1) runPlaybook(pbs[0].id, ioc.value, ioc.type);
@@ -3592,7 +3592,7 @@ function renderIdleFox(box) {
   hint.textContent = T('Вставьте отчёт, лог или выгрузку — или заберите страницу по ссылке.');
   const keys = document.createElement('p');
   keys.className = 'idle-keys';
-  keys.textContent = T('Ctrl+K — инструменты, плейбуки и действия · Ctrl+Enter — разобрать');
+  keys.textContent = T('Ctrl+K — инструменты, проверки и действия · Ctrl+Enter — разобрать');
   wrap.append(hint, keys);
 
   box.append(wrap);
@@ -3801,7 +3801,7 @@ function paletteItems() {
   }
   for (const pb of наборыВсе()) {
     items.push({
-      kind: T('плейбук'), label: T(pb.name), hint: T`${pb.steps.length} шагов · ${T(pb.note || '')}`,
+      kind: T('набор'), label: T(pb.name), hint: T`${pb.steps.length} шагов`,
       types: pb.types,
       run: () => {
         const sel = state.iocs.filter((i) => state.selected.has(iocKey(i)));
@@ -4033,7 +4033,7 @@ function planPlaybook(pb, value, type) {
 
 async function runPlaybook(pbId, value, type) {
   const pb = наборыВсе().find((p) => p.id === pbId);
-  if (!pb) { toast(T('Плейбук не найден')); return; }
+  if (!pb) { toast(T('Список проверок не настроен')); return; }
 
   const план = planPlaybook(pb, value, type);
   const steps = план.steps;
@@ -4102,7 +4102,7 @@ function showPlaybookMenu(anchorBtn, value, type) {
   if (!list.length) {
     const b = document.createElement('button');
     b.disabled = true;
-    b.textContent = T('Нет плейбуков для этих типов');
+    b.textContent = T('Список проверок не настроен или не подходит этим типам');
     menu.append(b);
   }
 

@@ -433,7 +433,7 @@
         <button class="btn btn-secondary" id="btn-add-case">Добавить в кейс</button>
         <button class="btn btn-secondary" id="btn-open-selected">Открыть в инструментах…</button>
         <button class="btn btn-secondary" id="btn-playbook-selected"
-                title="Последовательность проверок под тип задачи">Плейбук…</button>
+                title="Открыть мой список проверок по выбранным индикаторам">Мои проверки…</button>
         <!-- Дефанг на выходе. Индикаторы уходят в тикеты и чаты, где
              по ссылке кликают не глядя; руками это делать забывают. -->
         <button class="btn btn-mini" id="btn-copy-defanged"
@@ -643,7 +643,7 @@
         <div class="timeline-body" id="timeline-body"></div>
         <p class="timeline-note">
           Записывается то, что меняет состояние расследования: разобранные
-          источники, добавленные индикаторы, вердикты, плейбуки, выгрузки.
+          источники, добавленные индикаторы, вердикты, проверки, выгрузки.
           Текст заметок не записывается — он уже есть в таблице выше.
         </p>
       </details>
@@ -961,17 +961,17 @@
   </main>
 </div>
 
-<!-- Меню плейбуков: позиционируется у нажатой кнопки, поэтому живёт
+<!-- Меню проверок: позиционируется у нажатой кнопки, поэтому живёт
      в корне документа, а не внутри карточки индикатора. -->
 <div class="menu menu-float" id="playbook-menu" hidden></div>
 
 <!-- ================= КОМАНДНАЯ ПАЛИТРА =================
      86 инструментов — больше, чем можно найти глазами. Ctrl+K ищет
-     по инструментам, плейбукам и действиям сразу. -->
+     по инструментам, проверкам и действиям сразу. -->
 <div class="overlay" id="palette" hidden>
   <div class="palette-box" role="dialog" aria-label="Командная палитра">
     <input type="text" id="palette-input" autocomplete="off" spellcheck="false"
-           placeholder="Инструмент, плейбук или действие…  (Esc — закрыть)">
+           placeholder="Инструмент, проверка или действие…  (Esc — закрыть)">
     <div class="palette-list" id="palette-list"></div>
     <div class="palette-foot">
       <kbd>↑</kbd><kbd>↓</kbd> выбор · <kbd>Enter</kbd> запуск · <kbd>Esc</kbd> закрыть

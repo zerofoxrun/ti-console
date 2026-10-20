@@ -19,7 +19,7 @@ Output: `dist/ti-console.xpi`.
 Expected SHA-256 for version 1.1.0:
 
 ```
-646b4f640102a2fe4ee0d9270d94717103b8f97296e7c128db55be2f8a0e9888
+6c4f0662c557dfd223a9e9ef492dd59f2ebf3bae8a8f44ea94d16cbf7db31c01
 ```
 
 Every zip entry carries a fixed timestamp (2026-01-01 00:00:00), which is
@@ -29,7 +29,7 @@ To build the Chrome package as well: `python3 tools/build.py --chrome`.
 Its expected SHA-256 for this version:
 
 ```
-9d8a1c7758d462020b7b37956262f2f5a24072e8f2353743759e65f1422c2071
+1c597152545bae3a5a89d35fff9f102613176621de268bb08afd2a3e60b8d733
 ```
 
 ## Checks

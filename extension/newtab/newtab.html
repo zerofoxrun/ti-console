@@ -555,6 +555,9 @@
       </div>
 
       <p class="case-warn" id="case-warn" hidden></p>
+      <!-- Кейс изменён и не выгружен. Отдельной строкой, а не тостом:
+           тост исчезает, а повод никуда не девается. -->
+      <p class="case-warn" id="case-unsaved" hidden></p>
       <p class="case-migrated" id="case-migrated" hidden>
         Прежний общий кейс перенесён отдельным кейсом. Старые данные
         в профиле оставлены как резервная копия. Проверьте, что в нём
@@ -883,6 +886,64 @@
         </div>
       </details>
 
+      <!-- ============ МОИ ПРОВЕРКИ ============
+           Один набор на все типы индикаторов. Разбивки по типам в
+           настройке нет: она выводится из состава — набор применим
+           к тому типу, с которым работает хоть один его сервис,
+           а при открытии берутся только подходящие шаги.
+
+           Состав задаётся здесь, а не в попапе: в окне шириной
+           360 пикселей выбор из сотни сервисов — не настройка,
+           а головоломка. Попап показывает готовый набор и открывает его. -->
+      <section id="pb-box">
+        <h3 class="settings-title">Мои проверки</h3>
+        <p class="panel-hint">
+          Один список сервисов на все типы индикаторов. Одно нажатие
+          в окне расширения открывает их фоновыми вкладками — те из них,
+          что работают с найденным типом: для адреса сетевые сервисы,
+          для хеша песочницы. Режим данных и свои диапазоны действуют
+          и здесь: публичный сервис по клиентскому индикатору не
+          откроется ни при каких настройках.
+        </p>
+
+        <section class="pb-edit" id="pb-edit">
+          <label class="pb-field">
+            <span>Название</span>
+            <input type="text" id="pb-name" maxlength="80" spellcheck="false"
+                   placeholder="Мои проверки">
+          </label>
+
+          <div class="pb-field">
+            <span>Сервисы по порядку <span class="muted">— открываются сверху вниз</span></span>
+            <ol class="pb-steps" id="pb-steps"></ol>
+            <div class="input-actions">
+              <select id="pb-add-tool" aria-label="Сервис для добавления в набор"></select>
+              <button class="btn btn-mini" id="pb-add" type="button">Добавить</button>
+              <span class="spacer"></span>
+              <!-- Заготовка по встроенным последовательностям. Именно
+                   по нажатию, а не по умолчанию: объединение шести
+                   курируемых списков даёт восемнадцать вкладок на IPv4,
+                   и навязывать это нельзя. -->
+              <button class="btn btn-mini btn-ghost" id="pb-seed" type="button"
+                      title="Подставить сервисы из встроенных последовательностей — потом лишние можно убрать">Взять из встроенных</button>
+            </div>
+          </div>
+
+          <!-- Проблемы называются ДО сохранения. Набор, составленный
+               с ошибкой, ведёт себя тихо: шаг молча выпадает при
+               открытии, а аналитик считает проверку сделанной. -->
+          <div class="pb-problems" id="pb-problems" hidden></div>
+
+          <div class="input-actions">
+            <button class="btn btn-primary" id="pb-save" type="button">Сохранить</button>
+            <span class="spacer"></span>
+            <button class="btn btn-ghost btn-danger" id="pb-reset" type="button"
+                    title="Очистить список. Кейсы, хронология и остальные настройки не тронутся"
+                    hidden>Очистить</button>
+          </div>
+        </section>
+      </section>
+
       <!-- ============ ОБМЕН НАСТРОЙКАМИ ============ -->
       <h3 class="settings-title">Файл настроек</h3>
       <div class="input-actions">
@@ -920,16 +981,10 @@
 
 <div class="toast" id="toast" hidden></div>
 
-<script>
-/* Запасной выход. Если инициализация упадёт, тело так и останется скрытым,
-   и аналитик увидит пустую вкладку вместо интерфейса. Через 1,5 секунды
-   показываем страницу как есть — по-русски, но работающую. */
-setTimeout(function () {
-  document.documentElement.classList.add('i18n-ready');
-}, 1500);
-</script>
+<script src="fallback.js"></script>
 <script src="../locales/en.js"></script>
 <script src="../lib/i18n.js"></script>
+<script src="../lib/dom.js"></script>
 <script src="../lib/compat.js"></script>
 <script src="../lib/ioc.js"></script>
 <script src="../lib/fetchpage.js"></script>
@@ -958,6 +1013,8 @@ setTimeout(function () {
 <script src="../lib/matrix.js"></script>
 <script src="../lib/matrixpng.js"></script>
 <script src="../lib/ownranges.js"></script>
+<script src="../lib/unsaved.js"></script>
+<script src="../lib/myplaybooks.js"></script>
 <!-- Состав рабочего места. Подключается ДО newtab.js: тот применяет
      видимость сразу после чтения хранилища, чтобы аналитик не увидел
      сначала полный набор вкладок, а через миг — свой. Мигание

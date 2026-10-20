@@ -100,8 +100,8 @@ see the query but do not publish it.
 If your SOC distributes a list of own and client ranges through browser
 policy (`ownRanges`, `ownDomains`), values inside those ranges are
 flagged in the results and are never sent to public services: bulk open
-skips them, playbooks skip them, and opening one by hand asks for
-confirmation. The list itself is never transmitted — it is read from
+skips them, your check list skips them, and opening one by hand asks
+for confirmation. The list itself is never transmitted — it is read from
 policy and compared on your machine.
 
 ---
@@ -118,7 +118,7 @@ corner. The choice is stored in `storage.local` and survives a restart.
 **Chrome Web Store:**
 https://chromewebstore.google.com/detail/ti-console/nelhgieipckdlblbaoogiacpfkgkdpna
 
-**Firefox Add-ons:** https://addons.mozilla.org/en-US/firefox/addon/ti-console/
+**Firefox Add-ons:** under review; the link will be here once it is published.
 
 **From source, Chrome / Chromium:**
 
@@ -190,8 +190,8 @@ reproduced from the sources in this repository.
 
 ## Status
 
-Version 1.0.0. The extension is feature-complete for the workflow it
-describes and is in daily use. Interface localisation covers 1532 strings
+Version 1.1.0. The extension is feature-complete for the workflow it
+describes and is in daily use. Interface localisation covers 1490 strings
 in English and Russian.
 
 See [CHANGELOG.md](CHANGELOG.md).

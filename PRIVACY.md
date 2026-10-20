@@ -1,6 +1,6 @@
 # TI Console — Privacy Policy
 
-Updated: October 2026 · Extension version: 1.0.0
+Updated: October 2026 · Extension version: 1.1.0
 
 ## In short
 
@@ -67,8 +67,8 @@ opened yourself.
 If your SOC distributes a list of own and client ranges through browser
 policy (`ownRanges`, `ownDomains`), values inside those ranges are
 flagged in the results and are never sent to public services: bulk open
-skips them, a playbook skips them, and opening a single one asks for
-explicit confirmation. The list itself is never transmitted: it is read
+skips them, your check list skips them, and opening a single one asks
+for explicit confirmation. The list itself is never transmitted: it is read
 from browser policy and used only for comparison on your machine.
 
 ## Changes

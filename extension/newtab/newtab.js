@@ -397,6 +397,11 @@ const state = {
   hidePaid: false,      // скрывать инструменты, бесполезные без платного тарифа
   profile: 'vendor-reports',
   analysis: null,       // результат последнего анализа моделью
+  /* Накладка своих наборов проверок поверх встроенных: правки, новые
+   * наборы и список скрытых. Встроенные лежат в реестре и здесь не
+   * дублируются — см. lib/myplaybooks.js. */
+  наборыПравки: null,
+  наборыЗамечания: [],
   /* Состав рабочего места: что показывать, что спрятать. Разбор,
    * пресеты и учёт — в lib/settings.js; здесь только текущее значение. */
   settings: null,
@@ -3794,7 +3799,7 @@ function paletteItems() {
       run: () => openToolWithPrompt(t),
     });
   }
-  for (const pb of state.registry.playbooks || []) {
+  for (const pb of наборыВсе()) {
     items.push({
       kind: T('плейбук'), label: T(pb.name), hint: T`${pb.steps.length} шагов · ${T(pb.note || '')}`,
       types: pb.types,
@@ -3981,11 +3986,44 @@ function movePalette(delta) {
  * автоматический сканер, а к нему другие требования и другая цена ошибки.
  * ==================================================================== */
 
+/* ------------------------------------------------- МОИ ПРОВЕРКИ ---------
+ *
+ * Набор один и лежит в storage.local (lib/myplaybooks.js). Встроенные
+ * последовательности остались в реестре, но больше не предлагаются
+ * как отдельные наборы: они служат заготовкой, которую можно подставить
+ * в «Мои проверки» одной кнопкой. Весь интерфейс ниже спрашивает состав
+ * у одной функции — иначе правка видна в одном месте (в меню) и не
+ * видна в другом (в палитре), и человек считает, что не сохранилось.
+ * ------------------------------------------------------------------------ */
+function наборыВсе() {
+  if (!globalThis.TIMyPlaybooks) return [];
+  return TIMyPlaybooks.список(state.наборыПравки,
+                              (state.registry && state.registry.tools) || []);
+}
+
+async function загрузитьНаборы() {
+  if (!globalThis.TIMyPlaybooks) return;
+  const сырое = await ENV.storeGet(TIMyPlaybooks.КЛЮЧ, null);
+  const { хранилище, замечания } = TIMyPlaybooks.нормализовать(сырое);
+  state.наборыПравки = хранилище;
+  state.наборыЗамечания = замечания;
+  /* Починенное состояние записывается обратно сразу — иначе замечание
+   * про отброшенные записи показывалось бы при каждом запуске, а файл
+   * так и оставался бы битым. */
+  if (замечания.length) await сохранитьНаборы();
+}
+
+async function сохранитьНаборы() {
+  if (!globalThis.TIMyPlaybooks) return;
+  await ENV.storeSet(TIMyPlaybooks.КЛЮЧ, state.наборыПравки);
+}
+
 /* Планирование вынесено в lib/playbook.js и покрыто тестами: там
  * решается, какие шаги отбросит TLP-гейт, а ошибка в этом месте
- * означает отправку клиентского индикатора в публичный сервис. */
+ * означает отправку клиентского индикатора в публичный сервис.
+ * Свой набор идёт через ту же функцию: гейт для него не мягче. */
 function playbooksFor(types) {
-  return TIPlaybook.playbooksFor(state.registry && state.registry.playbooks, types);
+  return TIPlaybook.playbooksFor(наборыВсе(), types);
 }
 
 function planPlaybook(pb, value, type) {
@@ -3994,10 +4032,18 @@ function planPlaybook(pb, value, type) {
 }
 
 async function runPlaybook(pbId, value, type) {
-  const pb = (state.registry.playbooks || []).find((p) => p.id === pbId);
+  const pb = наборыВсе().find((p) => p.id === pbId);
   if (!pb) { toast(T('Плейбук не найден')); return; }
 
-  const { steps, skipped } = planPlaybook(pb, value, type);
+  const план = planPlaybook(pb, value, type);
+  const steps = план.steps;
+  /* Пропуск по типу — само устройство набора, а не потеря: список один
+   * на все типы, и при разборе адреса сервисы по хешам не открываются
+   * по замыслу. В отчёт о выполнении такие шаги не идут, иначе строка
+   * «пропущено 14» звучала бы при каждой исправной работе и перестала
+   * бы читаться там, где она важна, — на пропусках по режиму данных
+   * и по своим диапазонам. */
+  const skipped = план.skipped.filter((s) => s.why !== TIPlaybook.PB_SKIP.TYPE);
   if (!steps.length) {
     const своих = skipped.filter((s) => s.why === TIPlaybook.PB_SKIP.OWN).length;
     toast(T`«${pb.name}»: ни одного доступного шага${
@@ -4122,7 +4168,7 @@ function placeFloatingMenu(menu, anchorBtn) {
 
 async function runPlaybookOnSelected(pbId) {
   const targets = state.iocs.filter((i) => state.selected.has(iocKey(i)));
-  const pb = (state.registry.playbooks || []).find((p) => p.id === pbId);
+  const pb = наборыВсе().find((p) => p.id === pbId);
   const fit = targets.filter((i) => pb.types.includes(i.type));
   if (!fit.length) { toast(T('Среди выбранных нет индикаторов подходящего типа')); return; }
 
@@ -4434,6 +4480,7 @@ function renderCase() {
   $('#case-count').textContent = state.caseItems.length;
   $('#case-empty').hidden = state.caseItems.length > 0;
   updateVerdictStats();
+  renderUnsaved();
 
   state.caseItems.forEach((i, idx) => {
     migrateCaseItem(i);
@@ -4856,6 +4903,41 @@ function renderTimeline() {
     }
     box.append(ul);
   }
+}
+
+/* КЕЙС ИЗМЕНЁН И НЕ ВЫГРУЖЕН.
+ *
+ * Кейс живёт в профиле браузера: сброс профиля уничтожает расследование.
+ * Состояние считается по хронологии (lib/unsaved.js), а не по отдельному
+ * флагу: флаг надо выставлять в каждом месте, где кейс меняется, и одно
+ * забытое место даёт молчаливый дефект — предупреждения нет, человек
+ * считает, что выгрузил.
+ */
+function renderUnsaved() {
+  const el = $('#case-unsaved');
+  if (!el || !globalThis.TIUnsaved) return;
+  if (!state.caseItems.length) { el.hidden = true; el.textContent = ''; return; }
+  const н = TIUnsaved.напоминание(state.timeline || []);
+  el.hidden = !н.показывать;
+  el.textContent = н.показывать ? н.текст : '';
+  el.classList.toggle('is-urgent', !!н.срочно);
+}
+
+/* Закрытие вкладки с невыгруженным кейсом.
+ *
+ * Порог здесь НИЖЕ, чем у строки-напоминания: строка — это «пора бы»,
+ * а закрытие вкладки необратимо, и спросить стоит при любом
+ * невыгруженном изменении. Браузер покажет своё стандартное окно;
+ * текст подставить нельзя, это ограничение платформы. */
+function следитьЗаЗакрытием() {
+  window.addEventListener('beforeunload', (e) => {
+    if (!globalThis.TIUnsaved) return;
+    if (!state.caseItems.length) return;
+    const с = TIUnsaved.состояние(state.timeline || []);
+    if (!с.изменён) return;
+    e.preventDefault();
+    e.returnValue = '';
+  });
 }
 
 /* Счётчик непроверенных — единственное, что действительно надо видеть
@@ -5589,6 +5671,7 @@ function синхронизироватьНастройки() {
 
   renderForgotten();
   renderUsage();
+  рисоватьНаборы();
 }
 
 function renderForgotten() {
@@ -5682,9 +5765,223 @@ async function включитьФункцию(id) {
   toast(T`«${ф.имя}» включена`);
 }
 
+/* ================================================= РЕДАКТОР «МОИ ПРОВЕРКИ» ==
+ *
+ * Здесь только интерфейс. Разбор хранилища, проверка состава и вывод
+ * типов — в lib/myplaybooks.js и покрыты модульными проверками: решение
+ * «что попадёт в набор и к какому типу он применим» не должно жить
+ * в обработчике клика, иначе его нельзя прогнать без браузера.
+ *
+ * Набор один, поэтому ни списка наборов, ни кнопки «создать», ни выбора
+ * типов на экране нет. Правки держатся в памяти до «Сохранить»: экран
+ * настроек, который пишет в хранилище на каждое нажатие, не даёт
+ * передумать.
+ * ========================================================================= */
+
+/** Состав, который правят прямо сейчас. Записывается только по кнопке. */
+let редНабор = null;
+
+function подписьТипа(t) {
+  const м = (globalThis.IOC && IOC.TYPE_LABELS) || {};
+  return м[t] ? T(м[t]) : t;
+}
+
+function инструментПоId(id) {
+  return ((state.registry && state.registry.tools) || []).find((t) => t.id === id) || null;
+}
+
+/** Поднять в редактор то, что лежит в хранилище. */
+function рисоватьНаборы() {
+  if (!globalThis.TIMyPlaybooks || !$('#pb-steps')) return;
+  if (!редНабор) {
+    const х = TIMyPlaybooks.нормализовать(state.наборыПравки).хранилище;
+    редНабор = { name: х.набор.name, steps: х.набор.steps.slice() };
+  }
+  $('#pb-name').value = редНабор.name;
+  рисоватьШагиНабора();
+}
+
+function рисоватьШагиНабора() {
+  const ш = $('#pb-steps');
+  ш.textContent = '';
+  редНабор.steps.forEach((id, i) => {
+    const li = document.createElement('li');
+    li.className = 'pb-step';
+    li.dataset.tool = id;
+    const tool = инструментПоId(id);
+    const подпись = document.createElement('span');
+    if (tool) {
+      const d = document.createElement('i');
+      d.className = 'dot dot-' + (tool.exposure === 'public' ? 'public' : 'limited');
+      подпись.append(d, document.createTextNode(' ' + tool.name));
+      /* У каждой строки написано, для чего она сработает. Список один
+       * на все типы, и без этого непонятно, почему при разборе адреса
+       * открылось шесть сервисов из двадцати. */
+      const т = document.createElement('span');
+      т.className = 'muted';
+      т.textContent = ' — ' + (tool.types || []).map(подписьТипа).join(', ');
+      подпись.append(т);
+    } else {
+      /* Шаг, которого нет в реестре, НЕ прячется: молча укоротить
+       * чужой набор — значит сделать проверку короче, не сказав. */
+      подпись.className = 'pb-missing';
+      подпись.textContent = T`${id} — в реестре такого сервиса нет`;
+    }
+    li.append(подпись);
+
+    const акт = document.createElement('span');
+    акт.className = 'pb-step-act';
+    const кн = (текст, титул, вкл, действие) => {
+      const b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'btn btn-mini btn-ghost';
+      b.textContent = текст;
+      b.title = титул;
+      b.disabled = !вкл;
+      b.addEventListener('click', действие);
+      акт.append(b);
+    };
+    кн('↑', T('Выше'), i > 0, () => {
+      const s = редНабор.steps;
+      [s[i - 1], s[i]] = [s[i], s[i - 1]];
+      рисоватьШагиНабора();
+    });
+    кн('↓', T('Ниже'), i < редНабор.steps.length - 1, () => {
+      const s = редНабор.steps;
+      [s[i + 1], s[i]] = [s[i], s[i + 1]];
+      рисоватьШагиНабора();
+    });
+    кн('×', T('Убрать из набора'), true, () => {
+      редНабор.steps = редНабор.steps.filter((_, j) => j !== i);
+      рисоватьШагиНабора();
+    });
+    li.append(акт);
+    ш.append(li);
+  });
+  if (!редНабор.steps.length) {
+    const li = document.createElement('li');
+    li.className = 'pb-step muted';
+    li.textContent = T('Пока пусто — выберите сервисы ниже.');
+    ш.append(li);
+  }
+
+  рисоватьВыборСервиса();
+  const очистить = $('#pb-reset');
+  if (очистить) очистить.hidden = !TIMyPlaybooks.настроен(state.наборыПравки);
+  const заготовка = $('#pb-seed');
+  if (заготовка) заготовка.hidden = редНабор.steps.length > 0;
+}
+
+function рисоватьВыборСервиса() {
+  const sel = $('#pb-add-tool');
+  sel.textContent = '';
+  /* Фильтра по типам нет: набор на все типы. Список НЕ фильтруется и
+   * по текущему режиму данных — набор это настройка, а не запуск;
+   * собранный в публичном режиме не должен разваливаться оттого,
+   * что его правили в клиентском. */
+  const доступные = ((state.registry && state.registry.tools) || [])
+    .filter((t) => !редНабор.steps.includes(t.id))
+    .sort((a, b) => a.name.localeCompare(b.name, 'ru'));
+  if (!доступные.length) {
+    const o = document.createElement('option');
+    o.value = '';
+    o.textContent = T('Все сервисы реестра уже в наборе');
+    sel.append(o);
+  }
+  const подпись = (t) => t.name + ' · '
+    + (t.types || []).map(подписьТипа).join(', ') + ' · '
+    + (t.exposure === 'public' ? T('публичный') : T('ограниченный'));
+  /* Сто с лишним сервисов плоским списком глазами не просматриваются.
+   * Группы — те же, что в дереве инструментов: второй порядок для
+   * одного реестра разошёлся бы с первым через пару выпусков. */
+  for (const кат of ((state.registry && state.registry.categories) || [])) {
+    const свои = доступные.filter((t) => t.category === кат.id);
+    if (!свои.length) continue;
+    const g = document.createElement('optgroup');
+    g.label = T(кат.label || кат.id);
+    for (const t of свои) {
+      const o = document.createElement('option');
+      o.value = t.id;
+      o.textContent = подпись(t);
+      g.append(o);
+    }
+    sel.append(g);
+  }
+  $('#pb-add').disabled = !доступные.length;
+}
+
+function показатьПроблемы(ошибки, предупреждения) {
+  const эл = $('#pb-problems');
+  эл.textContent = '';
+  if (!ошибки.length && !предупреждения.length) { эл.hidden = true; return; }
+  эл.hidden = false;
+  эл.className = 'pb-problems' + (ошибки.length ? ' is-bad' : ' is-warn');
+  const ul = document.createElement('ul');
+  for (const с of [...ошибки, ...предупреждения]) {
+    const li = document.createElement('li');
+    li.textContent = с;
+    ul.append(li);
+  }
+  эл.append(ul);
+}
+
+async function сохранитьНаборИзРедактора() {
+  if (!редНабор) return;
+  const что = { name: $('#pb-name').value.trim(), steps: редНабор.steps.slice() };
+  const { ошибки, предупреждения } = TIMyPlaybooks.проверить(
+    что, (state.registry && state.registry.tools) || []);
+  показатьПроблемы(ошибки, предупреждения);
+  /* Ошибки запрещают сохранение, предупреждения — нет: «в клиентском
+   * режиме не останется шагов» бывает осознанным решением, а вот набор
+   * без сервисов не бывает. */
+  if (ошибки.length) { toast(T('Не сохранено: есть ошибки')); return; }
+
+  state.наборыПравки = TIMyPlaybooks.сохранить(state.наборыПравки, что);
+  await сохранитьНаборы();
+  редНабор = { name: что.name, steps: что.steps.slice() };
+  рисоватьШагиНабора();
+  toast(T`«${что.name}»: сохранено, сервисов ${что.steps.length}`);
+}
+
+function bindНаборы() {
+  if (!globalThis.TIMyPlaybooks || !$('#pb-steps')) return;
+  $('#pb-save').addEventListener('click', сохранитьНаборИзРедактора);
+  $('#pb-add').addEventListener('click', () => {
+    const id = $('#pb-add-tool').value;
+    if (!id || !редНабор || редНабор.steps.includes(id)) return;
+    редНабор.steps.push(id);
+    рисоватьШагиНабора();
+  });
+  $('#pb-seed').addEventListener('click', () => {
+    if (!редНабор) return;
+    редНабор.steps = TIMyPlaybooks.поВстроенным(
+      (state.registry && state.registry.playbooks) || []);
+    if (!$('#pb-name').value.trim()) {
+      $('#pb-name').value = T(TIMyPlaybooks.ИМЯ_ПО_УМОЛЧАНИЮ);
+    }
+    рисоватьШагиНабора();
+    /* Заготовка подставлена, но НЕ сохранена: человек должен сначала
+     * увидеть, что получилось, и убрать лишнее. */
+    toast(T`Подставлено сервисов: ${редНабор.steps.length}. `
+        + T('Уберите лишние и нажмите «Сохранить».'), 5000);
+  });
+  $('#pb-reset').addEventListener('click', async () => {
+    if (!confirm(T('Очистить список проверок? Кейсы, хронология и остальные '
+                 + 'настройки не тронутся.'))) return;
+    state.наборыПравки = TIMyPlaybooks.очистить();
+    await сохранитьНаборы();
+    редНабор = { name: '', steps: [] };
+    $('#pb-name').value = '';
+    показатьПроблемы([], []);
+    рисоватьШагиНабора();
+    toast(T('Список очищен'));
+  });
+}
+
 function bindSettings() {
   if (!globalThis.TISettings) return;
   const S = TISettings;
+  bindНаборы();
 
   $('#preset-row').addEventListener('click', async (e) => {
     const кн = e.target.closest('[data-preset]');
@@ -5781,6 +6078,7 @@ async function init() {
   применитьНастройки();
 
   state.registry = await ENV.loadTools();
+  await загрузитьНаборы();
   // Это версия РЕЕСТРА инструментов, а не расширения: реестр обновляется
   // с сервера отдельно и живёт своим циклом. Без подписи цифру читают
   // как версию продукта и потом не могут сойтись в разговоре о том,
@@ -6613,6 +6911,9 @@ async function init() {
 }
 
 document.addEventListener('DOMContentLoaded', init);
+/* Слежение за закрытием вешается здесь же, а не внутри init:
+ * init асинхронный, и до его конца вкладку уже можно закрыть. */
+следитьЗаЗакрытием();
 
 /* ПЕРЕКЛЮЧАТЕЛЬ ЯЗЫКА.
  * Значение запоминается в storage.local и применяется перезагрузкой

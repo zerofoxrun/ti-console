@@ -16,16 +16,44 @@ python3 tools/build.py --firefox
 
 Output: `dist/ti-console.xpi`.
 
-Expected SHA-256 for version 1.0.0:
+Expected SHA-256 for version 1.1.0:
 
 ```
-cbd2dcd958d075bc23d8e95ab55f655da551e6b59a56e06774e222daeaa4cdfd
+646b4f640102a2fe4ee0d9270d94717103b8f97296e7c128db55be2f8a0e9888
 ```
 
 Every zip entry carries a fixed timestamp (2026-01-01 00:00:00), which is
 what makes the archive reproducible. Building twice gives the same bytes.
 
 To build the Chrome package as well: `python3 tools/build.py --chrome`.
+Its expected SHA-256 for this version:
+
+```
+9d8a1c7758d462020b7b37956262f2f5a24072e8f2353743759e65f1422c2071
+```
+
+## Checks
+
+Two modules under `extension/lib` are pure — no DOM, no storage — and
+carry their own checks. They need no framework and no network:
+
+```
+node extension/lib/unsaved.test.js
+node extension/lib/myplaybooks.test.js
+```
+
+The second one covers what decides which services a check list opens for
+a given indicator type, and that the TLP gate applies to a list the user
+built exactly as it applied to the sequences shipped in the registry.
+
+That the English interface has no untranslated string left:
+
+```
+python3 tools/locales.py --проверить
+```
+
+All three run in CI on every push (`.github/workflows/ci.yml`), together
+with the reproducibility check above.
 
 ## What is generated, and by what
 

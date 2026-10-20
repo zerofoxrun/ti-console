@@ -3,6 +3,68 @@
 Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 Versions are [semantic](https://semver.org/).
 
+## [1.1.0] — 2026-10-20
+
+### Fixed
+- The popup applied the data-mode gate but not the own/customer ranges.
+  In public mode, pasting an address from your own subnets into the
+  popup and clicking a public service sent it — the console would have
+  refused and named the policy entry that fired. One policy now applies
+  on every surface; the fastest one is no longer the way around it.
+
+### Added
+- Check sets in the popup. The list is shown there for the matching
+  indicator type, and one button opens its steps as background tabs.
+  One click, no second confirmation: the number of tabs is printed on
+  the button before you press it, and confirming what you have just
+  read is how people learn to press "yes" without reading.
+- "My checks" — one list of services for every indicator type,
+  configured once on the Settings tab. Types are not selected: they are
+  derived from the contents, and parsing opens the services on the list
+  that work with the type found — network services for an address,
+  sandboxes for a hash. The six per-type sequences shipped in the
+  registry are no longer offered as separate sets; one button fills the
+  list from them, and the extra ones are dropped by hand afterwards.
+  The list starts empty on purpose: the union of the six is eighteen
+  services on IPv4, more than any one of them had, and an extension
+  that opens eighteen tabs on a fresh install is not a convenience.
+- Steps dropped because they do not match the indicator type are not
+  reported as skipped. For one list covering every type that is the
+  mechanism, not a loss, and a line that fires on every correct run
+  stops being read where it matters — on steps closed by data mode or
+  by your own ranges.
+- Contents are checked before they are saved. A missing service, a
+  duplicate step, a list that would be empty in customer-data mode, a
+  list that would open more than fifteen tabs for some type — each is
+  named on screen. A badly built list is quiet: the step just drops out
+  when it runs, and the report looks the same as if it had not.
+- Skipped steps are stated: "skipped 4: closed by customer-data mode".
+  A list that silently opens half of itself looks like one that opened
+  all of it.
+- A reminder when the case has unexported changes, and a browser prompt
+  before closing a tab that holds one. The case lives in the browser
+  profile, and "export before you close" was left to the analyst's
+  memory at the end of a shift — the thing data mode exists to stop
+  relying on.
+
+### Notes
+- The unexported state is computed from the case timeline, not from a
+  separate flag: a flag has to be set in every place the case changes,
+  and one forgotten place produces exactly the silent defect the feature
+  is meant to prevent.
+- `lib/unsaved.js` and `lib/myplaybooks.js` were added to the list of
+  files the dictionary builder scans. A file missing from that list does
+  not fail — its strings just stay Russian in the English interface.
+- The editor cannot create a service or set its exposure; it picks
+  services from the registry by id. Otherwise configuring the list would
+  be a way to declare a public service internal and walk around the TLP
+  gate. The list goes through the same `planPlaybook` the built-in
+  sequences did: the gate is not softer for it.
+- The popup now pauses 400 ms every five tabs while opening a set, the
+  same limiter the console has had. Without it Firefox treats the burst
+  as popup flood and silently collapses part of the tabs — an eleven-step
+  set becomes a six-step one and nobody is told.
+
 ## [1.0.0] — 2026-10-13
 
 ### Changed
